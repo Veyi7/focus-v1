@@ -34,6 +34,31 @@ import ListItem from '@mui/material/ListItem';
 import MailIcon from '@mui/icons-material/Mail';
 import { styled, useTheme } from '@mui/material/styles';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import BuildIcon from '@mui/icons-material/Build';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+
+//Task Imports
+import Container from '@mui/material/Container';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Collapse from '@mui/material/Collapse';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+
+const ExpandMore = styled((props) => {
+  const { expand, ...other } = props;
+  return <IconButton {...other} />;
+})(({ theme, expand }) => ({
+  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
+  marginLeft: 'auto',
+  transition: theme.transitions.create('transform', {
+    duration: theme.transitions.duration.shortest,
+  }),
+}));
 
 const drawerWidth = 240;
 
@@ -63,7 +88,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'flex-end',
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -104,26 +128,117 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 function ServerDay(props) {
     const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
-    //console.log(props.highlightedDays);
     const isSelected = highlightedDays.find((date) => props.day.$D === date.$D && props.day.$M === date.$M && props.day.$y === date.$y);
   
     return (
       <Badge
         key={props.day.toString()}
         overlap="circular"
-        badgeContent={isSelected ? '🌚' : undefined}
+        badgeContent={isSelected ? ' ' : undefined}
+        color='error'
+        size="small"
       >
         <PickersDay {...other} outsideCurrentMonth={outsideCurrentMonth} day={day} />
       </Badge>
     );
 }
 
+const isDone = (boolean) => {
+    if (boolean) {
+        return (<CheckIcon/>);
+    }
+
+    else {
+        return (<CloseIcon/>);
+    }
+}
+
 const Calendar = ({tasks}) => {
     const [highlightedDays, setHighlightedDays] = useState([]);
     const [value, setValue] = React.useState(dayjs());
-    const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const [selectedIndex, setSelectedIndex] = React.useState(0);
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const [calendarDate, setCalendarDate] = React.useState(dayjs());
+    const [expanded, setExpanded] = React.useState(false);
+
+    const [actualTask, setActualTask] = useState([]);
+
+
+    const loadTask = () => {
+        return (
+            <Box>
+                <Container maxWidth="sm" > 
+                    <Card sx={{ maxWidth: 600 }}>
+                        <CardHeader
+                            action={
+                                <IconButton aria-label="settings">
+                                    <MoreVertIcon />
+                                </IconButton>
+                            }
+                            title={actualTask.title}
+                            subheader={actualTask.startDateTime}
+                        />
+                        <CardContent>
+                            <Typography variant="body2" color="text.secondary">
+                                {actualTask.description}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Done: {isDone(actualTask.done)}
+                            </Typography>
+                        </CardContent>
+                        <CardActions disableSpacing>        
+                            <ExpandMore
+                                expand={expanded}
+                                onClick={handleExpandClick}
+                                aria-expanded={expanded}
+                                aria-label="show more"
+                            >
+                                <ExpandMoreIcon />
+                            </ExpandMore>
+                        </CardActions>
+                        <Collapse in={expanded} timeout="auto" unmountOnExit>
+                            <CardContent>
+                                <Typography paragraph>Creation Date: {actualTask.creationDateTime}</Typography>
+                            </CardContent>
+                        </Collapse>
+                    </Card>
+                </Container>
+            </Box>
+        );
+    }
+
+    const handleExpandClick = () => {
+        setExpanded(!expanded);
+    };
+
+    const retListItems = (task) => {
+        const index = 0;
+        return (
+            <ListItem 
+                key = {task.id}
+            >
+                <ListItemButton
+                    
+                    onClick={(event) => handleListItemClick(event, task)}
+                                            
+                >
+                    <ListItemIcon>
+                        <MailIcon />
+                    </ListItemIcon>
+                    <ListItemText primary = {task.title} />
+                </ListItemButton>        
+            </ListItem>
+                
+        );
+    };
+
+    const TaskDay = (tasks, calendarDate) => {
+    
+        const aux = tasks.filter(task => dayjs(task.startDateTime).$D === calendarDate.$D && dayjs(task.startDateTime).$M === calendarDate.$M && dayjs(task.startDateTime).$y === calendarDate.$y);
+        
+        return aux.map((task) => retListItems(task));
+    };
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -133,17 +248,63 @@ const Calendar = ({tasks}) => {
         setOpen(false);
     };
 
-    const handleListItemClick = (event, index) => {
-        setSelectedIndex(index);
+    function handleTask() {
+        var box = document.getElementById("myBox");
+        if (box.style.display === "none") {
+            box.style.display = "block";
+        } else {
+            box.style.display = "none";
+        }
+    }
+
+    function showTask() {
+        var box = document.getElementById("myBox");
+        box.style.display = "block";
+    }
+
+    function closeTask() {
+        var box = document.getElementById("myBox");
+        box.style.display = "none";
+    }
+
+    const handleListItemClick = (event, task) => {
+        if (task === actualTask) {
+            handleTask();
+        }
+        else {
+            setActualTask(task);
+            showTask();
+        }
+
     };
 
+    const handleCalendarClick = (newValue) => {
+        setValue(newValue);
+        setCalendarDate(newValue);
+        closeTask();
+    };
+
+    const handleIcon = (index) => {
+        if (index === 0) {
+            return <InboxIcon/>;
+        }
+        else if (index === 1) {
+            return <CalendarMonthIcon/>;
+        }
+        else if (index === 2) {
+            return <ScheduleIcon/>;
+        }
+        else if (index === 3) {
+            return <BuildIcon/>;
+        }
+    }
 
     useEffect(() => {
         if (tasks) {
             const aux = tasks.map(task => dayjs(task.startDateTime));
             setHighlightedDays(aux);
         }
-      },[]);
+    },[]);
 
     if (!tasks) {
         return (
@@ -166,106 +327,97 @@ const Calendar = ({tasks}) => {
         //console.log({tasks}); 
 
         return (
+            <div class="Row">
         
-            <div>
+                <div class="Column">
 
-                <Box sx={{ display: 'flex' }}>
-                    <CssBaseline />
-                    <AppBar position="fixed" open={open}>
-                        <Toolbar>
-                        <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={handleDrawerOpen}
-                            edge="start"
-                            sx={{
-                            marginRight: 5,
-                            ...(open && { display: 'none' }),
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography variant="h6" noWrap component="div">
-                            Calendar
-                        </Typography>
-                        </Toolbar>
-                    </AppBar>
-
-                    <Drawer variant="permanent" open={open}>
-                        <DrawerHeader>
-                        <IconButton onClick={handleDrawerClose}>
-                            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                        </IconButton>
-                        </DrawerHeader>
-                        <Divider />
-                        <List>
-                            {['Main', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
-                                <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                                <ListItemButton
-                                    sx={{
-                                    minHeight: 48,
-                                    justifyContent: open ? 'initial' : 'center',
-                                    px: 2.5,
-                                    }}
-                                >
-                                    <ListItemIcon
-                                    sx={{
-                                        minWidth: 0,
-                                        mr: open ? 3 : 'auto',
-                                        justifyContent: 'center',
-                                    }}
-                                    >
-                                    {index % 2 === 0 ? <InboxIcon /> : <CalendarMonthIcon />}
-                                    </ListItemIcon>
-                                    <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                                </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Drawer>
-
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateCalendar
-                            value={value} onChange={(newValue) => setValue(newValue)}
-                            renderLoading={() => <DayCalendarSkeleton />}
-                            slots={{
-                                day: ServerDay,
-                            }}
-                            slotProps={{
-                                day: {
-                                    highlightedDays,
-                                },
-                            }}
-                        />
-                    </LocalizationProvider>
-
-                    <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                        <List component="nav" aria-label="main mailbox folders">
-                            <ListItemButton
-                                selected={selectedIndex === 0}
-                                onClick={(event) => handleListItemClick(event, 0)}
+                    <Box sx={{ display: 'flex' }}>
+                        <CssBaseline />
+                        <AppBar position="fixed" open={open}>
+                            <Toolbar>
+                            <IconButton
+                                color="inherit"
+                                aria-label="open drawer"
+                                onClick={handleDrawerOpen}
+                                edge="start"
+                                sx={{
+                                marginRight: 5,
+                                ...(open && { display: 'none' }),
+                                }}
                             >
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Inbox" />
-                            </ListItemButton>
-                            <ListItemButton
-                                selected={selectedIndex === 1}
-                                onClick={(event) => handleListItemClick(event, 1)}
-                            >
-                            <ListItemIcon>
-                                <DraftsIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Drafts" />
-                            </ListItemButton>
-                        </List>
+                                <MenuIcon />
+                            </IconButton>
+                            <Typography variant="h6" noWrap component="div">
+                                Calendar
+                            </Typography>
+                            </Toolbar>
+                        </AppBar>
+                        
+                        <Drawer variant="permanent" open={open}>
+                            <DrawerHeader>
+                            <IconButton onClick={handleDrawerClose}>
+                                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                            </IconButton>
+                            </DrawerHeader>
+                            <Divider />
+                            <List>
+                                {['Main', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
+                                    <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                                        <ListItemButton
+                                            sx={{
+                                            minHeight: 48,
+                                            justifyContent: open ? 'initial' : 'center',
+                                            px: 2.5,
+                                            }}
+                                        >
+                                            <ListItemIcon
+                                            sx={{
+                                                minWidth: 0,
+                                                mr: open ? 3 : 'auto',
+                                                justifyContent: 'center',
+                                            }}
+                                            >
+                                                {handleIcon(index)}
+                                            </ListItemIcon>
+                                            <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Drawer>
+
+                        <Box sx={{ marginTop: '70px', width: '100%', maxWidth: 500, bgcolor: 'background.paper' }}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DateCalendar
+                                    value={value} onChange={(newValue) => handleCalendarClick(newValue)}
+                                    renderLoading={() => <DayCalendarSkeleton />}
+                                    slots={{
+                                        day: ServerDay,
+                                    }}
+                                    slotProps={{
+                                        day: {
+                                            highlightedDays,
+                                        },
+                                    }}
+                                />
+                            </LocalizationProvider>
+
+                            <List sx={{width: '100%', maxWidth: 500}}>
+                                {TaskDay(tasks, calendarDate)}
+                            </List>
+                        </Box>
+
                     </Box>
+                    
+                </div>
 
-                </Box>
+                <div class="Column">
+                    <div id="myBox" class ="hidden-box" onChange={loadTask()}>
+                        {loadTask()}
+                    </div>
+                    
+                </div>
 
-                
-                
             </div>
         );
     }
