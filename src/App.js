@@ -12,7 +12,7 @@ function App() {
     
     try {
       const response = await api.get("/task/all");
-
+ 
       setTasks(response.data);
     } 
     catch(err){

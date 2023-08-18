@@ -18,6 +18,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
+import NoteIcon from '@mui/icons-material/Note';
 
 //Drawer Imports
 import MuiDrawer from '@mui/material/Drawer';
@@ -31,7 +32,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
-import MailIcon from '@mui/icons-material/Mail';
 import { styled, useTheme } from '@mui/material/styles';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import BuildIcon from '@mui/icons-material/Build';
@@ -45,10 +45,18 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import LinearProgress from '@mui/material/LinearProgress';
+import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
 
 const ExpandMore = styled((props) => {
@@ -160,10 +168,29 @@ const Calendar = ({tasks}) => {
     const [value, setValue] = React.useState(dayjs());
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const [openMessage, setMessageOpen] = React.useState(false);
     const [calendarDate, setCalendarDate] = React.useState(dayjs());
     const [expanded, setExpanded] = React.useState(false);
 
     const [actualTask, setActualTask] = useState([]);
+
+    function handleDeleteClick() {
+        setMessageOpen(true);
+    };
+
+    function handleClose() {
+        setMessageOpen(false);
+    }
+
+    const handleErase = async () => {
+        const apiUrl = 'http://localhost:8080/task/delete';
+        const aux = actualTask.id;
+        api.delete(`${apiUrl}?id=${aux}`);
+        
+        setActualTask([]);
+
+        handleClose();
+    }
 
     //Creation of the task cards
     const loadTask = () => {
@@ -173,9 +200,39 @@ const Calendar = ({tasks}) => {
                     <Card sx={{ maxWidth: 600 }}>
                         <CardHeader
                             action={
-                                <IconButton aria-label="settings">
-                                    <MoreVertIcon />
-                                </IconButton>
+                                <div>
+                                    <IconButton aria-label="edit">
+                                        <EditIcon />
+                                    </IconButton>
+                                    
+                                    <IconButton 
+                                        aria-label="delete"
+                                        onClick={handleDeleteClick}>
+                                        <DeleteForeverIcon />
+                                    </IconButton>
+
+                                    <Dialog
+                                        open={openMessage}
+                                        onClose={handleClose}
+                                        aria-labelledby="alert-dialog-title"
+                                        aria-describedby="alert-dialog-description"
+                                    >
+                                        <DialogTitle id="alert-dialog-title">
+                                            {"Doo you really want to erase this task?"}
+                                        </DialogTitle>
+                                        <DialogContent>
+                                            <DialogContentText id="alert-dialog-description">
+                                                You won't be able to recover this task, unless you create it back.
+                                            </DialogContentText>
+                                        </DialogContent>
+                                        <DialogActions>
+                                        <Button onClick={handleClose}>Disagree</Button>
+                                        <Button onClick={handleErase} autoFocus>
+                                            Agree
+                                        </Button>
+                                        </DialogActions>
+                                    </Dialog>
+                                </div>
                             }
                             title={actualTask.title}
                             subheader={actualTask.startDateTime}
@@ -200,7 +257,9 @@ const Calendar = ({tasks}) => {
                         </CardActions>
                         <Collapse in={expanded} timeout="auto" unmountOnExit>
                             <CardContent>                               
-                                <Typography paragraph>Creation Date: {actualTask.creationDateTime}</Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Creation Date: {actualTask.creationDateTime}
+                                </Typography>
                             </CardContent>
                         </Collapse>
                     </Card>
@@ -216,7 +275,6 @@ const Calendar = ({tasks}) => {
 
     //Creates the list of Tasks for each day that has them
     const retListItems = (task) => {
-        const index = 0;
         return (
             <ListItem 
                 key = {task.id}
@@ -225,7 +283,9 @@ const Calendar = ({tasks}) => {
                     onClick={(event) => handleListItemClick(event, task)}                    
                 >
                     <ListItemIcon>
-                        <MailIcon />
+                        <NoteIcon 
+                            key = {task.id + 'N'} 
+                        />
                     </ListItemIcon>
                     <ListItemText primary = {task.title} />
                 </ListItemButton>        
@@ -234,7 +294,37 @@ const Calendar = ({tasks}) => {
     };
 
     //Handles what happens when you click on a miniTask
-    const handleListMiniTaskClick = (event, miniTask) => {
+    const handleListMiniTaskClick = async (event, miniTask) => {
+        //const boolvalue = false;
+        if (miniTask.done === true) {
+            const idmt = miniTask.id;
+            const titlemt = miniTask.title;
+            const response = await api.post("/task/update/minitask", {
+                id: idmt,
+                title: titlemt,
+                done: false
+            }, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+            });
+            miniTask.done = false;
+        }
+        else if (miniTask.done === false) {
+            const idmt = miniTask.id;
+            const titlemt = miniTask.title;
+            const response = await api.post("/task/update/minitask", {
+                id: idmt,
+                title: titlemt,
+                done: true
+            }, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+            });
+            miniTask.done = true;
+        }
+
     };
 
     //Creates the list of miniTasks for each task that has them
@@ -244,7 +334,7 @@ const Calendar = ({tasks}) => {
                 key = {miniTask.id}
             >
                 <ListItemButton
-                    //onClick={(event) => handleListMiniTaskClick(event, miniTask)}                 
+                    onClick={(event) => handleListMiniTaskClick(event, miniTask)}                 
                 >
                     <ListItemIcon>
                         {isDone(miniTask.done)}
@@ -257,8 +347,6 @@ const Calendar = ({tasks}) => {
 
     const progressCalc = (task) => {
         const aux = task.miniTasks.filter(miniTask => miniTask.done === true);
-        console.log(aux.length);
-        console.log((task.miniTasks).length);
         return ((aux.length/(task.miniTasks).length)*100);
     }
 
@@ -272,7 +360,9 @@ const Calendar = ({tasks}) => {
                         <List
                             subheader = {
                                 <ListSubheader component="div" id="nested-list-subheader">
-                                Mini Tasks
+                                    <Typography variant="h6" color="text.secondary">
+                                        Mini Tasks
+                                    </Typography>
                                 </ListSubheader>
                             }
                         >
@@ -466,7 +556,7 @@ const Calendar = ({tasks}) => {
                     </Box>
                 </div>
                 <div class="Column">
-                    <div id="myBox" class ="hidden-box" onChange={loadTask()}>
+                    <div id="myBox" class ="hidden-box">
                         {loadTask()}
                     </div>
                 </div>
