@@ -1,0 +1,10 @@
+.Row {
+    display: table;
+    width: 100%;
+}
+
+.Column {
+    display: table-cell;
+    border-spacing: 50px;
+    width: auto;
+}

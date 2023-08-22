@@ -4,6 +4,7 @@ import {useState,  useEffect} from 'react';
 import Layout from './components/Layout';
 import {Routes, Route} from 'react-router-dom';
 import Home from './components/home/Home';
+import Calendar from './components/calendar/Calendar';
 
 function App() {
 
@@ -30,9 +31,13 @@ function App() {
       
       <Routes>
         <Route path="/" element={<Layout/>}>
-          {tasks && <Route path="/" element={<Home tasks={tasks} />} ></Route>}
+          {tasks && <Route exact path="/" element={<Home tasks={tasks} />} ></Route>}
 
         </Route>
+        <Route>
+          {tasks && <Route path="/calendar" element={<Calendar tasks={tasks} />} ></Route>}
+        </Route>
+        {/* <Route path="/pomodoro" element={<Pomodoro/>}/> */}
       </Routes>
 
     </div>

@@ -1,5 +1,7 @@
 import './Calendar.css'
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom';
+import Home from '../home/Home';
 
 //Calendar Imports
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
@@ -19,6 +21,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import NoteIcon from '@mui/icons-material/Note';
+import AddIcon from '@mui/icons-material/Add';
 
 //Drawer Imports
 import MuiDrawer from '@mui/material/Drawer';
@@ -385,7 +388,9 @@ const Calendar = ({tasks}) => {
     //Selects the tasks for each day that has them
     const TaskDay = (tasks, calendarDate) => {
         const aux = tasks.filter(task => dayjs(task.startDateTime).$D === calendarDate.$D && dayjs(task.startDateTime).$M === calendarDate.$M && dayjs(task.startDateTime).$y === calendarDate.$y);
-        return aux.map((task) => retListItems(task));
+        if (aux.length > 0) {
+            return aux.map((task) => retListItems(task));
+        }
     };
 
     //Opens the menu drawer
@@ -455,6 +460,16 @@ const Calendar = ({tasks}) => {
         }
     }
 
+    const linkage = (index) => {
+        if (index === 0) {
+            return "/";
+        }
+        else if (index === 1) {
+            return "/calendar";
+        }
+        
+    }
+
     useEffect(() => {
         if (tasks) {
             const aux = tasks.map(task => dayjs(task.startDateTime));
@@ -510,7 +525,7 @@ const Calendar = ({tasks}) => {
                             </DrawerHeader>
                             <Divider />
                             <List>
-                                {['Main', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
+                                {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
                                     <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                                         <ListItemButton
                                             sx={{
@@ -518,6 +533,7 @@ const Calendar = ({tasks}) => {
                                             justifyContent: open ? 'initial' : 'center',
                                             px: 2.5,
                                             }}
+                                            component={Link} to={linkage(index)}
                                         >
                                             <ListItemIcon
                                             sx={{
