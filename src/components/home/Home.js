@@ -319,7 +319,7 @@ const Home = ({tasks}) => {
     }
 
     const changeVisible = () => {
-        //setActual(!actual);
+        setActual(!actual);
     }
 
     if (!tasks) {
@@ -395,7 +395,7 @@ const Home = ({tasks}) => {
                                     <Fab color="primary" aria-label="add">
                                         <AddIcon />
                                     </Fab>
-                                    <Fab size="medium" color="secondary" aria-label="order" onClick={changeVisible()}>
+                                    <Fab size="medium" color="secondary" aria-label="order" onClick={changeVisible}>
                                         <ReorderIcon />
                                     </Fab>
                                 </div>
