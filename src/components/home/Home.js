@@ -9,6 +9,7 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
 //Drawer Imports
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
@@ -25,6 +26,18 @@ import { styled, useTheme } from '@mui/material/styles';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import BuildIcon from '@mui/icons-material/Build';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+//Task Imports
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import LinearProgress from '@mui/material/LinearProgress';
+import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
+import EditIcon from '@mui/icons-material/Edit';
+import dayjs from 'dayjs';
+//Grid Imports
+import Grid from '@mui/material/Unstable_Grid2';
 
 // <Calendar tasks = {tasks} />
 
@@ -142,6 +155,155 @@ const Home = ({tasks}) => {
         
     }
 
+    const progressCalc = (task) => {
+        const aux = task.miniTasks.filter(miniTask => miniTask.done === true);
+        return ((aux.length/(task.miniTasks).length)*100);
+    }
+
+    //Handles what happens when you click on a miniTask
+    const handleListMiniTaskClick = async (event, miniTask) => {
+        //const boolvalue = false;
+        if (miniTask.done === true) {
+            const idmt = miniTask.id;
+            const titlemt = miniTask.title;
+            const response = await api.post("/task/update/minitask", {
+                id: idmt,
+                title: titlemt,
+                done: false
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            miniTask.done = false;
+        }
+        else if (miniTask.done === false) {
+            const idmt = miniTask.id;
+            const titlemt = miniTask.title;
+            const response = await api.post("/task/update/minitask", {
+                id: idmt,
+                title: titlemt,
+                done: true
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            miniTask.done = true;
+        }
+    };
+
+    //Handles if a task is done or not
+    const isDone = (boolean) => {
+        if (boolean) {
+            return (<CheckIcon/>);
+        }
+        else {
+            return (<CloseIcon/>);
+        }
+    }
+
+    //Creates the list of miniTasks for each task that has them
+    const retListMiniTasks = (miniTask) => {
+        return (
+            <ListItem 
+                key = {miniTask.id}
+            >
+                <ListItemButton
+                    onClick={(event) => handleListMiniTaskClick(event, miniTask)}                 
+                >
+                    <ListItemIcon>
+                        {isDone(miniTask.done)}
+                    </ListItemIcon>
+                    <ListItemText primary = {miniTask.title} />
+                </ListItemButton>        
+            </ListItem>
+        );
+    };
+
+    //Selects the miniTasks for each task
+    const miniTasks = (task) => {
+        if (task.miniTasks) {
+            if (task.miniTasks.length > 0) {
+                return (
+                    <Box>
+                        <LinearProgress variant="determinate" value={progressCalc(task)} />
+                        <List
+                            subheader = {
+                                <ListSubheader component="div" id="nested-list-subheader">
+                                    <Typography variant="h6" color="text.secondary">
+                                        Mini Tasks
+                                    </Typography>
+                                </ListSubheader>
+                            }
+                        >
+                            {(task.miniTasks).map((miniTask) => retListMiniTasks(miniTask))}        
+                        </List>
+                    </Box>
+                );
+            }
+            else {
+                return (
+                    <Typography variant="body2" color="text.secondary">
+                        Done: {isDone(task.done)}
+                    </Typography>
+                );
+            }
+        }
+        
+    };
+
+    const loadTask = (actualTask) => {
+        return (
+            <Grid xs={4} sm={4} md={6} key = {actualTask.id}>
+                <Card >
+                    <CardHeader
+                        action={
+                            <div>
+                                <IconButton aria-label="edit">
+                                    <EditIcon />
+                                </IconButton>
+                            </div>
+                        }
+                        title={actualTask.title}
+                        subheader={actualTask.startDateTime}
+                    />
+                    <CardContent>
+                        <Typography variant="body2" color="text.secondary">
+                            {actualTask.description}
+                        </Typography>
+
+                        {miniTasks(actualTask)} 
+                                    
+                        <Typography variant="body2" color="text.secondary">
+                            Creation Date: {actualTask.creationDateTime}
+                        </Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+        );
+    }
+
+    const handleTasks = (tasks) => {
+        if (tasks) {
+            if (tasks.length > 0) {
+                const sortedTasks = tasks.sort((a) => a.startDateTime);
+
+                return (
+                    <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 4, sm: 8, md: 18 }}>
+                        {sortedTasks.map((task) => loadTask(task))}
+                    </Grid>
+                        
+                );
+            }
+            else {
+                return ("Empty tasks");
+            }
+        }
+
+        return ("No tasks");
+    }
+
     if (!tasks) {
         return (
             <div>
@@ -210,6 +372,9 @@ const Home = ({tasks}) => {
                         </Drawer>
                     </Box>
                 </div>
+                <Box sx={{ marginLeft: '10px', marginRight: '10px', flexGrow: 1 , marginTop: '90px', width: '99%', bgcolor: 'background.paper' }}>
+                    {handleTasks(tasks)}
+                </Box>
             </div>
         )
     }

@@ -221,7 +221,7 @@ const Calendar = ({tasks}) => {
                                         aria-describedby="alert-dialog-description"
                                     >
                                         <DialogTitle id="alert-dialog-title">
-                                            {"Doo you really want to erase this task?"}
+                                            {"Do you really want to erase this task?"}
                                         </DialogTitle>
                                         <DialogContent>
                                             <DialogContentText id="alert-dialog-description">
