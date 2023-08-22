@@ -176,12 +176,8 @@ const Calendar = ({tasks}) => {
 
     const [actualTask, setActualTask] = useState([]);
 
-    function handleDeleteClick() {
-        setMessageOpen(true);
-    };
-
     function handleClose() {
-        setMessageOpen(false);
+        setMessageOpen(!openMessage);
     }
 
     const handleErase = async () => {
@@ -209,7 +205,7 @@ const Calendar = ({tasks}) => {
                                     
                                     <IconButton 
                                         aria-label="delete"
-                                        onClick={handleDeleteClick}>
+                                        onClick={handleClose}>
                                         <DeleteForeverIcon />
                                     </IconButton>
 
