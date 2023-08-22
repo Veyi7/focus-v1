@@ -1,6 +1,7 @@
 import Calendar from '../calendar/Calendar';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
+import './Home.css'
 
 //List Imports
 import InboxIcon from '@mui/icons-material/Inbox';
@@ -38,6 +39,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import dayjs from 'dayjs';
 //Grid Imports
 import Grid from '@mui/material/Unstable_Grid2';
+//Floating Icon Imports
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
+import ReorderIcon from '@mui/icons-material/Reorder';
 
 // <Calendar tasks = {tasks} />
 
@@ -121,6 +126,7 @@ const ExpandMore = styled((props) => {
 const Home = ({tasks}) => {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const [actual, setActual] = React.useState(false);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -287,21 +293,37 @@ const Home = ({tasks}) => {
     const handleTasks = (tasks) => {
         if (tasks) {
             if (tasks.length > 0) {
-                const sortedTasks = tasks.sort((a) => a.startDateTime);
-
-                return (
-                    <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 4, sm: 8, md: 18 }}>
-                        {sortedTasks.map((task) => loadTask(task))}
-                    </Grid>
-                        
-                );
+                if (actual) {
+                    const now = dayjs();
+                    const sortedTasks = tasks.sort((a, b) => dayjs(a.startDateTime) - dayjs(b.startDateTime));
+                    const daysorted = sortedTasks.filter((task) => dayjs(task.startDateTime) > now);
+                    return (
+                        <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 4, sm: 8, md: 18 }}>
+                            {daysorted.map((task) => loadTask(task))}
+                        </Grid>
+                            
+                    );
+                }
+                else {
+                    const sortedTasks = tasks.sort((a, b) => dayjs(a.startDateTime) - dayjs(b.startDateTime));
+                    return (
+                        <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 4, sm: 8, md: 18 }}>
+                            {sortedTasks.map((task) => loadTask(task))}
+                              
+                        </Grid>
+                            
+                    );
+                }
             }
             else {
                 return ("Empty tasks");
             }
         }
-
         return ("No tasks");
+    }
+
+    const changeVisible = () => {
+        //setActual(true);
     }
 
     if (!tasks) {
@@ -314,71 +336,80 @@ const Home = ({tasks}) => {
 
     else {
         return(
-            <div class="Row">
-                <div class="Column">
-                    <Box sx={{ display: 'flex' }}>
-                        <CssBaseline />
-                        <AppBar position="fixed" open={open}>
-                            <Toolbar>
-                            <IconButton
-                                color="inherit"
-                                aria-label="open drawer"
-                                onClick={handleDrawerOpen}
-                                edge="start"
-                                sx={{
-                                marginRight: 5,
-                                ...(open && { display: 'none' }),
-                                }}
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                            <Typography variant="h6" noWrap component="div">
-                                Home
-                            </Typography>
-                            </Toolbar>
-                        </AppBar>
-                        <Drawer variant="permanent" open={open}>
-                            <DrawerHeader>
-                            <IconButton onClick={handleDrawerClose}>
-                                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                            </IconButton>
-                            </DrawerHeader>
-                            <Divider />
-                            <List>
-                                {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
-                                    <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                                        <ListItemButton
-                                            sx={{
-                                            minHeight: 48,
-                                            justifyContent: open ? 'initial' : 'center',
-                                            px: 2.5,
-                                            }} 
-                                            component={Link} to={linkage(index)}
-                                        >
-                                            <ListItemIcon
-                                            sx={{
-                                                minWidth: 0,
-                                                mr: open ? 3 : 'auto',
-                                                justifyContent: 'center',
-                                            }}
+            <div>
+                <div>
+                    <div>
+                        <Box sx={{ display: 'flex' }}>
+                            <CssBaseline />
+                            <AppBar position="fixed" open={open}>
+                                <Toolbar>
+                                <IconButton
+                                    color="inherit"
+                                    aria-label="open drawer"
+                                    onClick={handleDrawerOpen}
+                                    edge="start"
+                                    sx={{
+                                    marginRight: 5,
+                                    ...(open && { display: 'none' }),
+                                    }}
+                                >
+                                    <MenuIcon />
+                                </IconButton>
+                                <Typography variant="h6" noWrap component="div">
+                                    Home
+                                </Typography>
+                                </Toolbar>
+                            </AppBar>
+                            <Drawer variant="permanent" open={open}>
+                                <DrawerHeader>
+                                <IconButton onClick={handleDrawerClose}>
+                                    {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                                </IconButton>
+                                </DrawerHeader>
+                                <Divider />
+                                <List>
+                                    {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
+                                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                                            <ListItemButton
+                                                sx={{
+                                                minHeight: 48,
+                                                justifyContent: open ? 'initial' : 'center',
+                                                px: 2.5,
+                                                }} 
+                                                component={Link} to={linkage(index)}
                                             >
-                                                {handleIcon(index)}
-                                            </ListItemIcon>
-                                            <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                                        </ListItemButton>
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </Drawer>
-                    </Box>
-                </div>
-                <Box sx={{ marginLeft: '10px', marginRight: '10px', flexGrow: 1 , marginTop: '90px', width: '99%', bgcolor: 'background.paper' }}>
-                    {handleTasks(tasks)}
-                </Box>
+                                                <ListItemIcon
+                                                sx={{
+                                                    minWidth: 0,
+                                                    mr: open ? 3 : 'auto',
+                                                    justifyContent: 'center',
+                                                }}
+                                                >
+                                                    {handleIcon(index)}
+                                                </ListItemIcon>
+                                                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Drawer>
+                            <Box sx={{ marginLeft: '20px', marginTop: '90px', width: '94%', bgcolor: 'background.paper' }}>
+                                {handleTasks(tasks)}
+                                <div class="floating-buttons">
+                                    <Fab color="primary" aria-label="add">
+                                        <AddIcon />
+                                    </Fab>
+                                    <Fab size="medium" color="secondary" aria-label="order" onClick={changeVisible()}>
+                                        <ReorderIcon />
+                                    </Fab>
+                                </div>
+                            </Box>
+                        </Box>
+                    </div>
+                </div>                        
             </div>
         )
     }
-    
 }
 
 export default Home

@@ -21,7 +21,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import NoteIcon from '@mui/icons-material/Note';
-import AddIcon from '@mui/icons-material/Add';
 
 //Drawer Imports
 import MuiDrawer from '@mui/material/Drawer';

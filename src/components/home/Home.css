@@ -1,10 +1,16 @@
-.Row {
-    display: table;
-    width: 200%;
+.container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
 }
-
-.Column {
-    display: table-cell;
-    border-spacing: 50px;
-    width: auto;
+  
+.floating-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    position: fixed;
+    bottom: 60px;
+    right: 60px;
+    z-index: 1;
 }
