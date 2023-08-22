@@ -129,11 +129,7 @@ const Home = ({tasks}) => {
     const [actual, setActual] = React.useState(false);
 
     const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-
-    const handleDrawerClose = () => {
-        setOpen(false);
+        setOpen(!open);
     };
 
     const handleIcon = (index) => {
@@ -323,7 +319,7 @@ const Home = ({tasks}) => {
     }
 
     const changeVisible = () => {
-        //setActual(true);
+        //setActual(!actual);
     }
 
     if (!tasks) {
@@ -362,7 +358,7 @@ const Home = ({tasks}) => {
                             </AppBar>
                             <Drawer variant="permanent" open={open}>
                                 <DrawerHeader>
-                                <IconButton onClick={handleDrawerClose}>
+                                <IconButton onClick={handleDrawerOpen}>
                                     {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                                 </IconButton>
                                 </DrawerHeader>
