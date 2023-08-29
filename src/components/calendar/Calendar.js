@@ -322,7 +322,6 @@ const Calendar = ({tasks}) => {
             });
             miniTask.done = true;
         }
-
     };
 
     //Creates the list of miniTasks for each task that has them

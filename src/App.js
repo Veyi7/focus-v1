@@ -5,6 +5,8 @@ import Layout from './components/Layout';
 import {Routes, Route} from 'react-router-dom';
 import Home from './components/home/Home';
 import Calendar from './components/calendar/Calendar';
+import Modify from './components/modify/Modify'
+import Create from './components/create/Create';
 
 function App() {
 
@@ -21,7 +23,7 @@ function App() {
     }
     
   }
-
+  const actualTask = null;
   useEffect(() => {
     getTasks();
   },[])
@@ -32,10 +34,15 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout/>}>
           {tasks && <Route exact path="/" element={<Home tasks={tasks} />} ></Route>}
-
         </Route>
         <Route>
           {tasks && <Route path="/calendar" element={<Calendar tasks={tasks} />} ></Route>}
+        </Route>
+        <Route>
+          {tasks && <Route path="/modify" element={<Modify tasks ={tasks} />}></Route>}
+        </Route>
+        <Route>
+          {tasks && <Route path="/create" element={<Create tasks ={tasks} />}></Route>}
         </Route>
         {/* <Route path="/pomodoro" element={<Pomodoro/>}/> */}
       </Routes>

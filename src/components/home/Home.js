@@ -255,6 +255,10 @@ const Home = ({tasks}) => {
         
     };
 
+    const modifyTask = (actualTask) => {
+
+    }
+
     const loadTask = (actualTask) => {
         return (
             <Grid xs={4} sm={4} md={6} key = {actualTask.id}>
@@ -320,7 +324,8 @@ const Home = ({tasks}) => {
 
     const changeVisible = () => {
         setActual(!actual);
-    }
+    };
+
 
     if (!tasks) {
         return (
@@ -333,76 +338,72 @@ const Home = ({tasks}) => {
     else {
         return(
             <div>
-                <div>
-                    <div>
-                        <Box sx={{ display: 'flex' }}>
-                            <CssBaseline />
-                            <AppBar position="fixed" open={open}>
-                                <Toolbar>
-                                <IconButton
-                                    color="inherit"
-                                    aria-label="open drawer"
-                                    onClick={handleDrawerOpen}
-                                    edge="start"
-                                    sx={{
-                                    marginRight: 5,
-                                    ...(open && { display: 'none' }),
-                                    }}
-                                >
-                                    <MenuIcon />
-                                </IconButton>
-                                <Typography variant="h6" noWrap component="div">
-                                    Home
-                                </Typography>
-                                </Toolbar>
-                            </AppBar>
-                            <Drawer variant="permanent" open={open}>
-                                <DrawerHeader>
-                                <IconButton onClick={handleDrawerOpen}>
-                                    {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                                </IconButton>
-                                </DrawerHeader>
-                                <Divider />
-                                <List>
-                                    {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
-                                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                                            <ListItemButton
-                                                sx={{
-                                                minHeight: 48,
-                                                justifyContent: open ? 'initial' : 'center',
-                                                px: 2.5,
-                                                }} 
-                                                component={Link} to={linkage(index)}
-                                            >
-                                                <ListItemIcon
-                                                sx={{
-                                                    minWidth: 0,
-                                                    mr: open ? 3 : 'auto',
-                                                    justifyContent: 'center',
-                                                }}
-                                                >
-                                                    {handleIcon(index)}
-                                                </ListItemIcon>
-                                                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Drawer>
-                            <Box sx={{ marginLeft: '20px', marginTop: '90px', width: '94%', bgcolor: 'background.paper' }}>
-                                {handleTasks(tasks)}
-                                <div class="floating-buttons">
-                                    <Fab color="primary" aria-label="add">
-                                        <AddIcon />
-                                    </Fab>
-                                    <Fab size="medium" color="secondary" aria-label="order" onClick={changeVisible}>
-                                        <ReorderIcon />
-                                    </Fab>
-                                </div>
-                            </Box>
-                        </Box>
-                    </div>
-                </div>                        
+                <Box sx={{ display: 'flex' }}>
+                    <CssBaseline />
+                    <AppBar position="fixed" open={open}>
+                        <Toolbar>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={handleDrawerOpen}
+                            edge="start"
+                            sx={{
+                            marginRight: 5,
+                            ...(open && { display: 'none' }),
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography variant="h6" noWrap component="div">
+                            Home
+                        </Typography>
+                        </Toolbar>
+                    </AppBar>
+                    <Drawer variant="permanent" open={open}>
+                        <DrawerHeader>
+                        <IconButton onClick={handleDrawerOpen}>
+                            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                        </IconButton>
+                        </DrawerHeader>
+                        <Divider />
+                        <List>
+                            {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
+                                <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                                    <ListItemButton
+                                        sx={{
+                                        minHeight: 48,
+                                        justifyContent: open ? 'initial' : 'center',
+                                        px: 2.5,
+                                        }} 
+                                        component={Link} to={linkage(index)}
+                                    >
+                                        <ListItemIcon
+                                        sx={{
+                                            minWidth: 0,
+                                            mr: open ? 3 : 'auto',
+                                            justifyContent: 'center',
+                                        }}
+                                        >
+                                            {handleIcon(index)}
+                                        </ListItemIcon>
+                                        <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Drawer>
+                    <Box sx={{ marginLeft: '20px', marginTop: '90px', width: '94%', bgcolor: 'background.paper' }}>
+                        {handleTasks(tasks)}
+                        <div className="floating-buttons">
+                            <Fab color="primary" aria-label="add" component={Link} to={"/create"}>
+                                <AddIcon />
+                            </Fab>
+                            <Fab size="medium" color="secondary" aria-label="order" onClick={changeVisible}>
+                                <ReorderIcon />
+                            </Fab>
+                        </div>
+                    </Box>
+                </Box>                      
             </div>
         )
     }
