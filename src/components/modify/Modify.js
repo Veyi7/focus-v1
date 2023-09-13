@@ -35,6 +35,9 @@ import dayjs from 'dayjs';
 import Button from '@mui/material/Button';
 import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
 
+//SignOutButton
+import { getAuth, signOut } from "firebase/auth";
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 
 const ExpandMore = styled((props) => {
@@ -114,7 +117,7 @@ const ExpandMore = styled((props) => {
     }),
   );
 
-const Modify = ({tasks}) => {
+const Modify = () => {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
     const { id } = useParams();
@@ -125,6 +128,8 @@ const Modify = ({tasks}) => {
     const [value, setValue] = useState(dayjs());
     const [actualMiniTask, setActualMiniTask] = useState([]);
     const [done, setDone] = useState(false);
+
+    const [tasks, setTasks] = React.useState([]);
 
     const navigate = useNavigate();
 
@@ -199,10 +204,21 @@ const Modify = ({tasks}) => {
         else if (index === 1) {
             return "/calendar";
         }
+        else if (index === 2) {
+          return "/pomodoro";
+        }
         
     }
-    //const location = useLocation();
-    //const taskID = location.state?.taskId || {};
+
+    const signOutButton = () => {
+      const auth = getAuth();
+      signOut(auth).then(() => {
+          console.log("Sign-out Succesful"); 
+          navigate('/');
+      }).catch((error)=> {
+          console.log(error);
+      })
+    }
 
     const setMt = (mt) => {
       if (miniTasks) {
@@ -242,23 +258,45 @@ const Modify = ({tasks}) => {
       if (title != null && title != "") {
           if (value != null) {
             const response = await api.post("/task/update?id="+id+"&title="+title+"&description="+description+"&date="+value.toString()+"&done="+done);
-            //const id = response.data.id;
-            //if (miniTasks) {
-                //if (miniTasks.length > 0) {
-                    //miniTasks.map((mt) => createMT(mt, id));
-                //}
-            //}
+            
             navigate('/home');
           }
       }
     };
 
-    useEffect(() => {
-      if (tasks) {
-          const idInt = parseInt(id);
-          const aux = tasks.filter(task => task.id === idInt);
-          aux.map((task) => setValues(task));
+    const getListTasks = async() => {
+      const user = localStorage.getItem("userInfo");
+
+      if (user) {
+          if (user != "") {
+              await getTasks(user);
+              
+          } 
       }
+    };
+
+    const getTasks = async (uid) => {
+      try {
+          const response = await api.get('/task/user?user_id='+uid);
+          setTasks(response.data);
+          const idInt = parseInt(id);
+          const aux = response.data.filter(task => task.id === idInt);
+          aux.map((task) => setValues(task));
+      } 
+      catch(err){
+          console.log(err);
+      }
+    };
+
+    useEffect(() => {
+      if (tasks.length === 0) {
+        getListTasks();
+      }
+      // if (tasks) {
+      //   const idInt = parseInt(id);
+      //   const aux = tasks.filter(task => task.id === idInt);
+      //   aux.map((task) => setValues(task));
+      // }
     },[]);
 
     return (
@@ -315,6 +353,25 @@ const Modify = ({tasks}) => {
                               </ListItemButton>
                           </ListItem>
                       ))}
+                      <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+                            <ListItemButton
+                            sx={{
+                                minHeight: 48,
+                                justifyContent: open ? 'initial' : 'center',
+                                px: 2.5,
+                            }} 
+                            onClick={() => signOutButton()}>
+                                <ListItemIcon
+                                sx={{
+                                    minWidth: 0,
+                                    mr: open ? 3 : 'auto',
+                                    justifyContent: 'center',
+                                }}>
+                                    <LogoutIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Sign-Out"} sx={{ opacity: open ? 1 : 0 }} />
+                            </ListItemButton>
+                        </ListItem>
                   </List>
               </Drawer>
               <Box sx={{ marginLeft: '20px', marginTop: '90px'}}>

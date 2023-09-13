@@ -1,4 +1,3 @@
-import Calendar from '../calendar/Calendar';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import './Home.css'
@@ -172,6 +171,9 @@ const Home = () => {
         }
         else if (index === 1) {
             return "/calendar";
+        }
+        else if (index === 2) {
+            return "/pomodoro"
         }
         
     }

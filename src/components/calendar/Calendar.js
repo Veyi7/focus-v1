@@ -179,7 +179,7 @@ const Calendar = () => {
     const [calendarDate, setCalendarDate] = React.useState(dayjs());
     const [expanded, setExpanded] = React.useState(false);
     const [tasks, setTasks] = React.useState([]);
-    const [actualTask, setActualTask] = useState([]);
+    const [actualTask, setActualTask] = React.useState([]);
 
     const navigate = useNavigate();
 
@@ -229,7 +229,7 @@ const Calendar = () => {
                         <CardHeader
                             action={
                                 <div>
-                                    <IconButton aria-label="edit">
+                                    <IconButton aria-label="edit" component={Link} to={'/modify/'+actualTask.id}>
                                         <EditIcon />
                                     </IconButton>
                                     
@@ -336,7 +336,10 @@ const Calendar = () => {
                   'Content-Type': 'multipart/form-data'
                 }
             });
-            miniTask.done = false;
+            const indice = actualTask.miniTasks.findIndex((mt) => mt.id === idmt);
+            const aux = actualTask;
+            aux.miniTasks[indice].done = false;
+            setActualTask(aux);
         }
         else if (miniTask.done === false) {
             const idmt = miniTask.id;
@@ -350,7 +353,10 @@ const Calendar = () => {
                   'Content-Type': 'multipart/form-data'
                 }
             });
-            miniTask.done = true;
+            const indice = actualTask.miniTasks.findIndex((mt) => mt.id === idmt);
+            const aux = actualTask;
+            aux.miniTasks[indice].done = true;
+            setActualTask(aux);
         }
     };
 
@@ -491,6 +497,9 @@ const Calendar = () => {
         else if (index === 1) {
             return "/calendar";
         }
+        else if (index === 2) {
+            return "/pomodoro";
+        }
         
     }
 
@@ -602,7 +611,7 @@ const Calendar = () => {
                                 </ListItem>
                             </List>
                         </Drawer>
-                        <Box sx={{display: 'flex', marginTop: '70px', width: '100%', maxWidth: 500, bgcolor: 'background.paper' }}>
+                        <Box sx={{marginTop: '70px', width: '100%', maxWidth: 500, bgcolor: 'background.paper' }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateCalendar
                                     value={value} onChange={(newValue) => handleCalendarClick(newValue)}

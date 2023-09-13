@@ -153,6 +153,9 @@ const Create = ({tasks}) => {
         else if (index === 1) {
             return "/calendar";
         }
+        else if (index === 2) {
+            return "/pomodoro";
+        }
     };
 
     const createMT = async (mt, id) => {
