@@ -25,6 +25,7 @@ import { styled, useTheme } from '@mui/material/styles';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import BuildIcon from '@mui/icons-material/Build';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import TextField from '@mui/material/TextField';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -33,6 +34,10 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 import Button from '@mui/material/Button';
 import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
+
+import { useNavigate } from 'react-router-dom';
+import { getAuth, signOut } from "firebase/auth";
+import { useMeridiemMode } from '@mui/x-date-pickers/internals/hooks/date-helpers-hooks';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -119,11 +124,13 @@ const Create = ({tasks}) => {
     const [description, setDescription] = useState('');
     const [miniTasks, setMiniTasks] = React.useState([]);
     const [actualMiniTask, setActualMiniTask] = useState('');
-    
+
+    const navigate = useNavigate();
+
     const handleDrawerOpen = () => {
         setOpen(!open);
     };
-
+ 
     const handleIcon = (index) => {
         if (index === 0) {
             return <InboxIcon/>;
@@ -141,7 +148,7 @@ const Create = ({tasks}) => {
 
     const linkage = (index) => {
         if (index === 0) {
-            return "/";
+            return "/home";
         }
         else if (index === 1) {
             return "/calendar";
@@ -159,64 +166,60 @@ const Create = ({tasks}) => {
         });
     };
 
-    const getTasks = async () => {
-        const response = await api.get("/task/all");
-        return response;
-    }
-
     const createTask = async () => {
         if (title != null && title != "") {
             if (value != null) {
                 const response = await api.post("/task/new", {
                     title: title,
                     description: description,
-                    data: value
+                    data: value,
+                    user_id: localStorage.getItem("userInfo")
                 }, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                const aux = await getTasks();
-                const aux2 = aux.data.filter(task => task.title === title);
+                const id = response.data.id;
                 if (miniTasks) {
                     if (miniTasks.length > 0) {
-                        miniTasks.map((mt) => createMT(mt, aux2[0].id));
+                        miniTasks.map((mt) => createMT(mt, id));
                     }
                 }
-                
+                navigate('/home');
             }
         }
     };
 
     const handleDescription = (description) => {
-        //console.log(description); 
         setDescription(description.toString());
     };
 
     const handleTitle = (title) => {
-        //console.log(title);
         setTitle(title.toString());
     };
 
     const addMiniTask = () => {
-        if (miniTasks) {
-            if (miniTasks.length > 0) {
-                const aux = miniTasks;
-                aux.push(actualMiniTask);
-                setMiniTasks(aux);
+        if (actualMiniTask != "") {
+            if (miniTasks) {
+                if (miniTasks.length > 0) {
+                    const aux = miniTasks;
+                    aux.push(actualMiniTask);
+                    setMiniTasks(aux);
+                }
+                else {
+                    const aux = [];
+                    aux.push(actualMiniTask);
+                    setMiniTasks(aux);
+                }
             }
             else {
                 const aux = [];
                 aux.push(actualMiniTask);
                 setMiniTasks(aux);
             }
+            setActualMiniTask("");
         }
-        else {
-            const aux = [];
-            aux.push(actualMiniTask);
-            setMiniTasks(aux);
-        }
-        setActualMiniTask("");
+        
     };
 
     const miniTaskList = (miniTasks) => {
@@ -230,6 +233,16 @@ const Create = ({tasks}) => {
             </ListItem>
         );
     };
+
+    const signOutButton = () => {
+        const auth = getAuth();
+        signOut(auth).then(() => {
+            console.log("Sign-out Succesful"); 
+            navigate('/');
+        }).catch((error)=> {
+            console.log(error);
+        })
+    }
 
     return (
         <div>
@@ -285,7 +298,27 @@ const Create = ({tasks}) => {
                                 </ListItemButton>
                             </ListItem>
                         ))}
+                        <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+                            <ListItemButton
+                            sx={{
+                                minHeight: 48,
+                                justifyContent: open ? 'initial' : 'center',
+                                px: 2.5,
+                            }} 
+                            onClick={() => signOutButton()}>
+                                <ListItemIcon
+                                sx={{
+                                    minWidth: 0,
+                                    mr: open ? 3 : 'auto',
+                                    justifyContent: 'center',
+                                }}>
+                                    <LogoutIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={"Sign-Out"} sx={{ opacity: open ? 1 : 0 }} />
+                            </ListItemButton>
+                        </ListItem>
                     </List>
+                    
                 </Drawer>
                 <Box sx={{ marginLeft: '20px', marginTop: '90px'}}>
                     <div>
@@ -337,7 +370,7 @@ const Create = ({tasks}) => {
                     </div>
                     <div>
                         <Button variant="contained" onClick={createTask}>Create</Button>
-                        <Button component={Link} to={"/"}>Cancel</Button>
+                        <Button component={Link} to={"/home"}>Cancel</Button>
                     </div>
                 </Box>
             </Box>

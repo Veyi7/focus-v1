@@ -60,6 +60,11 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 
+//SignOutButton
+import { getAuth, signOut } from "firebase/auth";
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useNavigate } from 'react-router-dom';
+
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -165,7 +170,7 @@ const isDone = (boolean) => {
     }
 }
 
-const Calendar = ({tasks}) => {
+const Calendar = () => {
     const [highlightedDays, setHighlightedDays] = useState([]);
     const [value, setValue] = React.useState(dayjs());
     const theme = useTheme();
@@ -173,12 +178,37 @@ const Calendar = ({tasks}) => {
     const [openMessage, setMessageOpen] = React.useState(false);
     const [calendarDate, setCalendarDate] = React.useState(dayjs());
     const [expanded, setExpanded] = React.useState(false);
-
+    const [tasks, setTasks] = React.useState([]);
     const [actualTask, setActualTask] = useState([]);
+
+    const navigate = useNavigate();
 
     function handleClose() {
         setMessageOpen(!openMessage);
     }
+
+    const getListTasks = async() => {
+        const user = localStorage.getItem("userInfo");
+
+        if (user) {
+            if (user != "") {
+                await getTasks(user);
+                
+            } 
+        }
+    };
+
+    const getTasks = async (uid) => {
+        try {
+            const response = await api.get('/task/user?user_id='+uid);
+            setTasks(response.data);
+            const aux = response.data.map(task => dayjs(task.startDateTime));
+            setHighlightedDays(aux);
+        } 
+        catch(err){
+            console.log(err);
+        }
+    };
 
     const handleErase = async () => {
         const apiUrl = 'http://localhost:8080/task/delete';
@@ -186,8 +216,8 @@ const Calendar = ({tasks}) => {
         api.delete(`${apiUrl}?id=${aux}`);
         
         setActualTask([]);
-
         handleClose();
+        window.location.reload();
     }
 
     //Creation of the task cards
@@ -456,7 +486,7 @@ const Calendar = ({tasks}) => {
 
     const linkage = (index) => {
         if (index === 0) {
-            return "/";
+            return "/home";
         }
         else if (index === 1) {
             return "/calendar";
@@ -464,10 +494,19 @@ const Calendar = ({tasks}) => {
         
     }
 
+    const signOutButton = () => {
+        const auth = getAuth();
+        signOut(auth).then(() => {
+            console.log("Sign-out Succesful"); 
+            navigate('/');
+        }).catch((error)=> {
+            console.log(error);
+        })
+    }
+
     useEffect(() => {
-        if (tasks) {
-            const aux = tasks.map(task => dayjs(task.startDateTime));
-            setHighlightedDays(aux);
+        if (tasks.length === 0) {
+            getListTasks();
         }
     },[]);
 
@@ -488,8 +527,8 @@ const Calendar = ({tasks}) => {
         //console.log({tasks}); 
 
         return (
-            <div class="Row">
-                <div class="Column">
+            <div className="Row">
+                <div className="Column">
                     <Box sx={{ display: 'flex' }}>
                         <CssBaseline />
                         <AppBar position="fixed" open={open}>
@@ -542,9 +581,28 @@ const Calendar = ({tasks}) => {
                                         </ListItemButton>
                                     </ListItem>
                                 ))}
+                                <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20, left: 0 }}>
+                                    <ListItemButton
+                                    sx={{
+                                        minHeight: 48,
+                                        justifyContent: open ? 'initial' : 'center',
+                                        px: 2.5,
+                                    }} 
+                                    onClick={() => signOutButton()}>
+                                        <ListItemIcon
+                                        sx={{
+                                            minWidth: 0,
+                                            mr: open ? 3 : 'auto',
+                                            justifyContent: 'center',
+                                        }}>
+                                            <LogoutIcon/>
+                                        </ListItemIcon>
+                                        <ListItemText primary={"Sign-Out"} sx={{ opacity: open ? 1 : 0 }} />
+                                    </ListItemButton>
+                                </ListItem>
                             </List>
                         </Drawer>
-                        <Box sx={{ marginTop: '70px', width: '100%', maxWidth: 500, bgcolor: 'background.paper' }}>
+                        <Box sx={{display: 'flex', marginTop: '70px', width: '100%', maxWidth: 500, bgcolor: 'background.paper' }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateCalendar
                                     value={value} onChange={(newValue) => handleCalendarClick(newValue)}
@@ -565,8 +623,8 @@ const Calendar = ({tasks}) => {
                         </Box>
                     </Box>
                 </div>
-                <div class="Column">
-                    <div id="myBox" class ="hidden-box">
+                <div className="Column">
+                    <div id="myBox" className ="hidden-box">
                         {loadTask()}
                     </div>
                 </div>

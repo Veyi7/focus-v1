@@ -37,14 +37,18 @@ import LinearProgress from '@mui/material/LinearProgress';
 import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
 import EditIcon from '@mui/icons-material/Edit';
 import dayjs from 'dayjs';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 //Grid Imports
 import Grid from '@mui/material/Unstable_Grid2';
 //Floating Icon Imports
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import ReorderIcon from '@mui/icons-material/Reorder';
-
-// <Calendar tasks = {tasks} />
+import Tooltip from '@mui/material/Tooltip';
+//SignOutButton
+import { getAuth, signOut } from "firebase/auth";
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useNavigate } from 'react-router-dom';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -123,10 +127,25 @@ const ExpandMore = styled((props) => {
     }),
   );
 
-const Home = ({tasks}) => {
+const Home = () => {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
     const [actual, setActual] = React.useState(false);
+    const [tasks, setTasks] = React.useState([]);
+    const [refresh, setRefresh] = React.useState(true);
+
+    const navigate = useNavigate();
+
+    const getListTasks = async() => {
+        const user = localStorage.getItem("userInfo");
+
+        if (user) {
+            if (user != "") {
+                await getTasks(user);
+                setRefresh(false);
+            } 
+        }
+    };
 
     const handleDrawerOpen = () => {
         setOpen(!open);
@@ -149,7 +168,7 @@ const Home = ({tasks}) => {
 
     const linkage = (index) => {
         if (index === 0) {
-            return "/";
+            return "/home";
         }
         else if (index === 1) {
             return "/calendar";
@@ -164,7 +183,6 @@ const Home = ({tasks}) => {
 
     //Handles what happens when you click on a miniTask
     const handleListMiniTaskClick = async (event, miniTask) => {
-        //const boolvalue = false;
         if (miniTask.done === true) {
             const idmt = miniTask.id;
             const titlemt = miniTask.title;
@@ -178,6 +196,7 @@ const Home = ({tasks}) => {
                 }
             });
             miniTask.done = false;
+            window.location.reload();
         }
         else if (miniTask.done === false) {
             const idmt = miniTask.id;
@@ -192,6 +211,7 @@ const Home = ({tasks}) => {
                 }
             });
             miniTask.done = true;
+            window.location.reload();
         }
     };
 
@@ -246,28 +266,97 @@ const Home = ({tasks}) => {
             }
             else {
                 return (
-                    <Typography variant="body2" color="text.secondary">
-                        Done: {isDone(task.done)}
-                    </Typography>
+                    <LinearProgress variant="determinate" value={(task.done)*100} />
                 );
             }
         }
         
     };
 
-    const modifyTask = (actualTask) => {
+    const deleteForever = async (id) => {
+        const response = await api.delete("/task/delete?id="+id);
+        window.location.reload();
+    };
 
+    const changeBoolean = async (task) => {
+        if (task.done === false) {
+            const response = await api.post("/task/update", {
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                date: task.startDateTime,
+                done: true
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            window.location.reload();
+        }
+        else {
+            const response = await api.post("/task/update", {
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                date: task.startDateTime,
+                done: false
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            window.location.reload();
+        }
+    };
+
+    const markAsDone = (task) => {
+        if (task.miniTasks.length === 0) {
+            if (task.done) {
+                return (
+                    <Tooltip title="Mark the task as To Do" arrow>
+                        <IconButton aria-label="check"
+                            onClick={() => {changeBoolean(task)}}
+                        >
+                            {isDone(task.done)}
+                        </IconButton>
+                    </Tooltip>
+                );
+            }
+            else {
+                return (
+                    <Tooltip title="Mark the task as Done" arrow>
+                        <IconButton aria-label="check"
+                            onClick={() => {changeBoolean(task)}}
+                        >
+                            {isDone(task.done)}
+                        </IconButton>
+                    </Tooltip>
+                );
+            }
+            
+
+        }
     }
 
     const loadTask = (actualTask) => {
         return (
-            <Grid xs={4} sm={4} md={6} key = {actualTask.id}>
-                <Card >
+            <Grid xs={4} sm={4} md={6} key = {actualTask.id + '+'}>
+                <Card key = {actualTask.id}>
                     <CardHeader
                         action={
                             <div>
-                                <IconButton aria-label="edit">
+                                {markAsDone(actualTask)}
+
+                                <IconButton aria-label="edit"
+                                    component={Link} to={'/modify/'+actualTask.id}
+                                >
                                     <EditIcon />
+                                </IconButton>
+
+                                <IconButton aria-label="erase"
+                                    onClick={() => {deleteForever(actualTask.id)}}
+                                >
+                                    <DeleteForeverIcon/>
                                 </IconButton>
                             </div>
                         }
@@ -290,8 +379,12 @@ const Home = ({tasks}) => {
         );
     }
 
-    const handleTasks = (tasks) => {
+    const handleTasks = () => {
         if (tasks) {
+            if (refresh) {
+                getListTasks();
+            }
+
             if (tasks.length > 0) {
                 if (actual) {
                     const now = dayjs();
@@ -309,14 +402,13 @@ const Home = ({tasks}) => {
                     return (
                         <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 4, sm: 8, md: 18 }}>
                             {sortedTasks.map((task) => loadTask(task))}
-                              
                         </Grid>
                             
                     );
                 }
             }
-            else {
-                return ("Empty tasks");
+            else if (tasks.length === 0) {
+                return ("You can start by creating a new task by clicking on the + button");
             }
         }
         return ("No tasks");
@@ -326,6 +418,29 @@ const Home = ({tasks}) => {
         setActual(!actual);
     };
 
+    const getTasks = async (uid) => {
+        try {
+            const response = await api.get('/task/user?user_id='+uid);
+            setTasks(response.data);
+        } 
+        catch(err){
+            console.log(err);
+        }
+    };
+
+    const signOutButton = () => {
+        const auth = getAuth();
+        signOut(auth).then(() => {
+            console.log("Sign-out Succesful"); 
+            navigate('/');
+        }).catch((error)=> {
+            console.log(error);
+        })
+    }
+
+    useEffect(() => {
+        
+    },[]);
 
     if (!tasks) {
         return (
@@ -390,17 +505,40 @@ const Home = ({tasks}) => {
                                     </ListItemButton>
                                 </ListItem>
                             ))}
+                            <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+                                <ListItemButton
+                                sx={{
+                                    minHeight: 48,
+                                    justifyContent: open ? 'initial' : 'center',
+                                    px: 2.5,
+                                }} 
+                                onClick={() => signOutButton()}>
+                                    <ListItemIcon
+                                    sx={{
+                                        minWidth: 0,
+                                        mr: open ? 3 : 'auto',
+                                        justifyContent: 'center',
+                                    }}>
+                                        <LogoutIcon/>
+                                    </ListItemIcon>
+                                    <ListItemText primary={"Sign-Out"} sx={{ opacity: open ? 1 : 0 }} />
+                                </ListItemButton>
+                            </ListItem>
                         </List>
                     </Drawer>
                     <Box sx={{ marginLeft: '20px', marginTop: '90px', width: '94%', bgcolor: 'background.paper' }}>
                         {handleTasks(tasks)}
                         <div className="floating-buttons">
-                            <Fab color="primary" aria-label="add" component={Link} to={"/create"}>
-                                <AddIcon />
-                            </Fab>
-                            <Fab size="medium" color="secondary" aria-label="order" onClick={changeVisible}>
-                                <ReorderIcon />
-                            </Fab>
+                            <Tooltip title="Opens the creation Task window" arrow>
+                                <Fab color="primary" aria-label="add" component={Link} to={{pathname: "/create"}}>
+                                    <AddIcon />
+                                </Fab>
+                            </Tooltip>
+                            <Tooltip title="Cleans the list of tasks from past events or lets you see them" arrow>
+                                <Fab size="medium" color="secondary" aria-label="order" onClick={changeVisible}>
+                                    <ReorderIcon />
+                                </Fab>
+                            </Tooltip>
                         </div>
                     </Box>
                 </Box>                      

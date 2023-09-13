@@ -7,46 +7,59 @@ import Home from './components/home/Home';
 import Calendar from './components/calendar/Calendar';
 import Modify from './components/modify/Modify'
 import Create from './components/create/Create';
+import Login from './components/login/Login';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from "firebase/auth";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC1GY_zDCrvFwHZLG85ivSbiXLWcBLK3z0",
+  authDomain: "focusapp-c58cf.firebaseapp.com",
+  projectId: "focusapp-c58cf",
+  storageBucket: "focusapp-c58cf.appspot.com",
+  messagingSenderId: "227244550985",
+  appId: "1:227244550985:web:ab88c7ff75c3d4858a0898"
+};
 
 function App() {
 
   const [tasks, setTasks] = useState();
+
+  const app = initializeApp(firebaseConfig);
+
   const getTasks = async () => {
-    
     try {
       const response = await api.get("/task/all");
- 
       setTasks(response.data);
     } 
     catch(err){
       console.log(err);
     }
-    
   }
-  const actualTask = null;
+
   useEffect(() => {
-    getTasks();
+    //getTasks();
   },[])
 
   return (
     <div className="App">
-      
       <Routes>
-        <Route path="/" element={<Layout/>}>
-          {tasks && <Route exact path="/" element={<Home tasks={tasks} />} ></Route>}
+        <Route>
+          {<Route exact path="/" element={<Login/>} ></Route>}
         </Route>
         <Route>
-          {tasks && <Route path="/calendar" element={<Calendar tasks={tasks} />} ></Route>}
+          {<Route path="/home" element={<Home/>} ></Route>}
         </Route>
         <Route>
-          {tasks && <Route path="/modify" element={<Modify tasks ={tasks} />}></Route>}
+          {<Route path="/calendar" element={<Calendar/>} ></Route>}
         </Route>
         <Route>
-          {tasks && <Route path="/create" element={<Create tasks ={tasks} />}></Route>}
+          {<Route path="/modify/:id" element={<Modify/>}></Route>}
+        </Route>
+        <Route>
+          {<Route path="/create" element={<Create/>}></Route>}
         </Route>
         {/* <Route path="/pomodoro" element={<Pomodoro/>}/> */}
       </Routes>
-
     </div>
   );
 }

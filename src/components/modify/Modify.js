@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 //List Imports
 import InboxIcon from '@mui/icons-material/Inbox';
 import Box from '@mui/material/Box';
@@ -25,6 +26,16 @@ import { styled, useTheme } from '@mui/material/styles';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import BuildIcon from '@mui/icons-material/Build';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+
+import TextField from '@mui/material/TextField';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs from 'dayjs';
+import Button from '@mui/material/Button';
+import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
+
+import { useNavigate } from 'react-router-dom';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -106,6 +117,61 @@ const ExpandMore = styled((props) => {
 const Modify = ({tasks}) => {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const { id } = useParams();
+    const [actualTask, setActualTask] = useState([]);
+    const [title, setTitle]  = useState("");
+    const [description, setDescription]  = useState("");
+    const [miniTasks, setMiniTasks] = useState([]);
+    const [value, setValue] = useState(dayjs());
+    const [actualMiniTask, setActualMiniTask] = useState([]);
+    const [done, setDone] = useState(false);
+
+    const navigate = useNavigate();
+
+    const handleDescription = (description) => {
+      //console.log(description); 
+      setDescription(description.toString());
+  };
+
+  const handleTitle = (title) => {
+      //console.log(title);
+      setTitle(title.toString());
+  };
+
+  const addMiniTask = () => {
+      if (miniTasks) {
+          if (miniTasks.length > 0) {
+              const aux = miniTasks;
+              aux.push(actualMiniTask);
+              setMiniTasks(aux);
+          }
+          else {
+              const aux = [];
+              aux.push(actualMiniTask);
+              setMiniTasks(aux);
+          }
+      }
+      else {
+          const aux = [];
+          aux.push(actualMiniTask);
+          setMiniTasks(aux);
+      }
+      setActualMiniTask("");
+  };
+
+  const miniTaskList = (miniTasks) => {
+    if (miniTasks) {
+      return miniTasks.map((mt) => retListItems(mt));
+    }
+  };
+
+  const retListItems = (mt) => {
+      return (
+          <ListItem>
+              <ListItemText primary = {mt.title} />    
+          </ListItem>
+      );
+  };
     
     const handleDrawerOpen = () => {
         setOpen(!open);
@@ -128,72 +194,182 @@ const Modify = ({tasks}) => {
 
     const linkage = (index) => {
         if (index === 0) {
-            return "/";
+            return "/home";
         }
         else if (index === 1) {
             return "/calendar";
         }
         
     }
-    const location = useLocation();
-    const taskID = location.state?.taskId || {};
+    //const location = useLocation();
+    //const taskID = location.state?.taskId || {};
+
+    const setMt = (mt) => {
+      if (miniTasks) {
+          if (miniTasks.length > 0) {
+              console.log("pushea a array con elementos");
+              const aux = miniTasks;
+              aux.push(mt);
+              setMiniTasks(aux);
+          }
+          else {
+              console.log("Pushea a Array Vacío");
+              const aux = [];
+              aux.push(mt);
+              setMiniTasks(aux);
+          }
+      }
+      else {
+          const aux = [];
+          aux.push(mt);
+          setMiniTasks(aux);
+      }
+    };
+
+    const setValues = (aux) => {
+      setTitle(aux.title);
+      if (aux.description) {
+        setDescription(aux.description);
+      }
+      setValue(dayjs(aux.startDateTime));
+      if (aux.miniTasks.length > 0) {
+        aux.miniTasks.map((mt) => setMt(mt));
+      }
+      setDone(aux.done);
+    }
+
+    const modifyTask = async () => {
+      if (title != null && title != "") {
+          if (value != null) {
+            const response = await api.post("/task/update?id="+id+"&title="+title+"&description="+description+"&date="+value.toString()+"&done="+done);
+            //const id = response.data.id;
+            //if (miniTasks) {
+                //if (miniTasks.length > 0) {
+                    //miniTasks.map((mt) => createMT(mt, id));
+                //}
+            //}
+            navigate('/home');
+          }
+      }
+    };
+
+    useEffect(() => {
+      if (tasks) {
+          const idInt = parseInt(id);
+          const aux = tasks.filter(task => task.id === idInt);
+          aux.map((task) => setValues(task));
+      }
+    },[]);
 
     return (
         <div>
             <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <AppBar position="fixed" open={open}>
-                    <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        edge="start"
-                        sx={{
-                        marginRight: 5,
-                        ...(open && { display: 'none' }),
-                        }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" noWrap component="div">
-                        Modify
+              <CssBaseline />
+              <AppBar position="fixed" open={open}>
+                  <Toolbar>
+                  <IconButton
+                      color="inherit"
+                      aria-label="open drawer"
+                      onClick={handleDrawerOpen}
+                      edge="start"
+                      sx={{
+                      marginRight: 5,
+                      ...(open && { display: 'none' }),
+                      }}
+                  >
+                      <MenuIcon />
+                  </IconButton>
+                  <Typography variant="h6" noWrap component="div">
+                      Modify
+                  </Typography>
+                  </Toolbar>
+              </AppBar>
+              <Drawer variant="permanent" open={open}>
+                  <DrawerHeader>
+                  <IconButton onClick={handleDrawerOpen}>
+                      {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                  </IconButton>
+                  </DrawerHeader>
+                  <Divider />
+                  <List>
+                      {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
+                          <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                              <ListItemButton
+                                  sx={{
+                                  minHeight: 48,
+                                  justifyContent: open ? 'initial' : 'center',
+                                  px: 2.5,
+                                  }} 
+                                  component={Link} to={linkage(index)}
+                              >
+                                  <ListItemIcon
+                                  sx={{
+                                      minWidth: 0,
+                                      mr: open ? 3 : 'auto',
+                                      justifyContent: 'center',
+                                  }}
+                                  >
+                                      {handleIcon(index)}
+                                  </ListItemIcon>
+                                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                              </ListItemButton>
+                          </ListItem>
+                      ))}
+                  </List>
+              </Drawer>
+              <Box sx={{ marginLeft: '20px', marginTop: '90px'}}>
+                <div>
+                    <Typography variant="h4">
+                        Modify a Task
                     </Typography>
-                    </Toolbar>
-                </AppBar>
-                <Drawer variant="permanent" open={open}>
-                    <DrawerHeader>
-                    <IconButton onClick={handleDrawerOpen}>
-                        {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                    </IconButton>
-                    </DrawerHeader>
-                    <Divider />
-                    <List>
-                        {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
-                            <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                                <ListItemButton
-                                    sx={{
-                                    minHeight: 48,
-                                    justifyContent: open ? 'initial' : 'center',
-                                    px: 2.5,
-                                    }} 
-                                    component={Link} to={linkage(index)}
-                                >
-                                    <ListItemIcon
-                                    sx={{
-                                        minWidth: 0,
-                                        mr: open ? 3 : 'auto',
-                                        justifyContent: 'center',
-                                    }}
-                                    >
-                                        {handleIcon(index)}
-                                    </ListItemIcon>
-                                    <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
-                </Drawer>
+                </div>
+                <div className='spacing'>
+                    <TextField
+                        required
+                        id="task-title"
+                        label="Title"
+                        value={title}
+                        onChange={(event) => handleTitle(event.target.value)}
+                    />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DateTimePicker
+                            label="Date and Time Picker"
+                            value={value}
+                            onChange={(newValue) => setValue(newValue)}
+                        />
+                    </LocalizationProvider>
+                </div>
+                <div>
+                    <TextField
+                        id="task-description"
+                        label="Description"
+                        fullWidth 
+                        value={description}
+                        onChange={(event) => handleDescription(event.target.value)}
+                        margin="normal"
+                    />
+                </div>
+                <div className='spacing'>
+                    <TextField
+                        id="miniTask-title"
+                        label="MiniTask"
+                        value={actualMiniTask}
+                        fullWidth
+                        onChange={(event) => setActualMiniTask(event.target.value)}
+                        margin="normal"
+                    />
+                    <Button variant="contained" onClick={addMiniTask}>Add MiniTask</Button>
+                </div>
+                <div className='spacing'>
+                  <List>
+                      {miniTaskList(miniTasks)}
+                  </List>
+                </div>
+                <div>
+                    <Button variant="contained" onClick={modifyTask}>Modify Task</Button>
+                    <Button component={Link} to={"/home"}>Cancel</Button>
+                </div>
+              </Box>
             </Box>
         </div>
     );

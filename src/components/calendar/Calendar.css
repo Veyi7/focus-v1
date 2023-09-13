@@ -1,14 +1,18 @@
 .Row {
-    display: table;
+    display: flex;
     width: 100%;
 }
 
 .Column {
-    display: table-cell;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-spacing: 50px;
-    width: auto;
+    width: 500px;
 }
 
 .hidden-box {
+    margin-top: 100px;
+    width: 500px;
     display: none;
 }
