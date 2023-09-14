@@ -1,6 +1,5 @@
 import './App.css';
-import api from './api/axiosConfig';
-import {useState,  useEffect} from 'react';
+import {useEffect} from 'react';
 import {Routes, Route} from 'react-router-dom';
 import Home from './components/home/Home';
 import Calendar from './components/calendar/Calendar';
@@ -9,7 +8,6 @@ import Create from './components/create/Create';
 import Login from './components/login/Login';
 import Pomodoro from './components/pomodoro/Pomodoro';
 import { initializeApp } from 'firebase/app';
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyC1GY_zDCrvFwHZLG85ivSbiXLWcBLK3z0",
@@ -22,22 +20,9 @@ const firebaseConfig = {
 
 function App() {
 
-  const [tasks, setTasks] = useState();
-
   const app = initializeApp(firebaseConfig);
 
-  const getTasks = async () => {
-    try {
-      const response = await api.get("/task/all");
-      setTasks(response.data);
-    } 
-    catch(err){
-      console.log(err);
-    }
-  }
-
   useEffect(() => {
-    //getTasks();
   },[])
 
   return (
@@ -61,7 +46,6 @@ function App() {
         <Route>
           {<Route path="/pomodoro" element={<Pomodoro/>}></Route>}
         </Route>
-          
       </Routes>
     </div>
   );

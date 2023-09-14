@@ -37,7 +37,8 @@ import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
 
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signOut } from "firebase/auth";
-import { useMeridiemMode } from '@mui/x-date-pickers/internals/hooks/date-helpers-hooks';
+
+import { useTranslation } from 'react-i18next';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -116,7 +117,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
-const Create = ({tasks}) => {
+const Create = () => {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = React.useState(dayjs());
@@ -126,6 +127,16 @@ const Create = ({tasks}) => {
     const [actualMiniTask, setActualMiniTask] = useState('');
 
     const navigate = useNavigate();
+
+    const { t, i18n } = useTranslation('global');
+
+    const [language, setLanguage] = React.useState('en');
+
+    const handleChange = (event) => {
+        setLanguage(event.target.value);
+
+        i18n.changeLanguage(event.target.value);
+    };
 
     const handleDrawerOpen = () => {
         setOpen(!open);
@@ -266,7 +277,7 @@ const Create = ({tasks}) => {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
-                        Create
+                        {t("header.create")}
                     </Typography>
                     </Toolbar>
                 </AppBar>
@@ -278,7 +289,7 @@ const Create = ({tasks}) => {
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
+                        {[ t("header.home") , t("header.calendar"), t("header.pomodoros"), 'Adjustments'].map((text, index) => (
                             <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                                 <ListItemButton
                                     sx={{
@@ -317,7 +328,7 @@ const Create = ({tasks}) => {
                                 }}>
                                     <LogoutIcon/>
                                 </ListItemIcon>
-                                <ListItemText primary={"Sign-Out"} sx={{ opacity: open ? 1 : 0 }} />
+                                <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
                             </ListItemButton>
                         </ListItem>
                     </List>
@@ -326,14 +337,14 @@ const Create = ({tasks}) => {
                 <Box sx={{ marginLeft: '20px', marginTop: '90px'}}>
                     <div>
                         <Typography variant="h4">
-                            Create a New Task
+                            {t("task.create-title")}
                         </Typography>
                     </div>
                     <div className='spacing'>
                         <TextField
                             required
                             id="task-title"
-                            label="Title"
+                            label={t("task.title")}
                             value={title}
                             onChange={(event) => handleTitle(event.target.value)}
                         />
@@ -348,7 +359,7 @@ const Create = ({tasks}) => {
                     <div>
                         <TextField
                             id="task-description"
-                            label="Description"
+                            label={t("task.description")}
                             fullWidth 
                             value={description}
                             onChange={(event) => handleDescription(event.target.value)}
@@ -358,13 +369,13 @@ const Create = ({tasks}) => {
                     <div className='spacing'>
                         <TextField
                             id="miniTask-title"
-                            label="MiniTask"
+                            label={t("task.miniTask")}
                             value={actualMiniTask}
                             fullWidth
                             onChange={(event) => setActualMiniTask(event.target.value)}
                             margin="normal"
                         />
-                        <Button variant="contained" onClick={addMiniTask}>Add MiniTask</Button>
+                        <Button variant="contained" onClick={addMiniTask}>{t("task.add-miniTask")}</Button>
                     </div>
                     <div className='spacing'>
                         <List>
@@ -372,8 +383,8 @@ const Create = ({tasks}) => {
                         </List>
                     </div>
                     <div>
-                        <Button variant="contained" onClick={createTask}>Create</Button>
-                        <Button component={Link} to={"/home"}>Cancel</Button>
+                        <Button variant="contained" onClick={createTask}>{t("task.create")}</Button>
+                        <Button component={Link} to={"/home"}>{t("task.cancel")}</Button>
                     </div>
                 </Box>
             </Box>

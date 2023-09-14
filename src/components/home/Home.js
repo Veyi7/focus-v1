@@ -49,6 +49,8 @@ import { getAuth, signOut } from "firebase/auth";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 
+import { useTranslation } from 'react-i18next';
+
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
     return <IconButton {...other} />;
@@ -132,6 +134,16 @@ const Home = () => {
     const [actual, setActual] = React.useState(false);
     const [tasks, setTasks] = React.useState([]);
     const [refresh, setRefresh] = React.useState(true);
+
+    const { t, i18n } = useTranslation('global');
+
+    const [language, setLanguage] = React.useState('en');
+
+    const handleChange = (event) => {
+        setLanguage(event.target.value);
+
+        i18n.changeLanguage(event.target.value);
+    };
 
     const navigate = useNavigate();
 
@@ -256,7 +268,7 @@ const Home = () => {
                             subheader = {
                                 <ListSubheader component="div" id="nested-list-subheader">
                                     <Typography variant="h6" color="text.secondary">
-                                        Mini Tasks
+                                        {t("task.miniTask-list")}
                                     </Typography>
                                 </ListSubheader>
                             }
@@ -315,7 +327,7 @@ const Home = () => {
         if (task.miniTasks.length === 0) {
             if (task.done) {
                 return (
-                    <Tooltip title="Mark the task as To Do" arrow>
+                    <Tooltip title={t("tooltips.todo-button")} arrow>
                         <IconButton aria-label="check"
                             onClick={() => {changeBoolean(task)}}
                         >
@@ -326,7 +338,7 @@ const Home = () => {
             }
             else {
                 return (
-                    <Tooltip title="Mark the task as Done" arrow>
+                    <Tooltip title={t("tooltips.done-button")} arrow>
                         <IconButton aria-label="check"
                             onClick={() => {changeBoolean(task)}}
                         >
@@ -373,7 +385,7 @@ const Home = () => {
                         {miniTasks(actualTask)} 
                                     
                         <Typography variant="body2" color="text.secondary">
-                            Creation Date: {actualTask.creationDateTime}
+                            {t("task.creation-date")} {actualTask.creationDateTime}
                         </Typography>
                     </CardContent>
                 </Card>
@@ -410,7 +422,7 @@ const Home = () => {
                 }
             }
             else if (tasks.length === 0) {
-                return ("You can start by creating a new task by clicking on the + button");
+                return (t("task.no-tasks-phrase"));
             }
         }
         return ("No tasks");
@@ -472,7 +484,7 @@ const Home = () => {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" noWrap component="div">
-                            Home
+                            {t("header.home")}
                         </Typography>
                         </Toolbar>
                     </AppBar>
@@ -484,7 +496,7 @@ const Home = () => {
                         </DrawerHeader>
                         <Divider />
                         <List>
-                            {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
+                            {[ t("header.home") , t("header.calendar"), t("header.pomodoros"), 'Adjustments'].map((text, index) => (
                                 <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                                     <ListItemButton
                                         sx={{
@@ -523,7 +535,7 @@ const Home = () => {
                                     }}>
                                         <LogoutIcon/>
                                     </ListItemIcon>
-                                    <ListItemText primary={"Sign-Out"} sx={{ opacity: open ? 1 : 0 }} />
+                                    <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
                                 </ListItemButton>
                             </ListItem>
                         </List>
@@ -531,12 +543,12 @@ const Home = () => {
                     <Box sx={{ marginLeft: '20px', marginTop: '90px', width: '94%', bgcolor: 'background.paper' }}>
                         {handleTasks(tasks)}
                         <div className="floating-buttons">
-                            <Tooltip title="Opens the creation Task window" arrow>
+                            <Tooltip title={t("tooltips.create-button")} arrow>
                                 <Fab color="primary" aria-label="add" component={Link} to={{pathname: "/create"}}>
                                     <AddIcon />
                                 </Fab>
                             </Tooltip>
-                            <Tooltip title="Cleans the list of tasks from past events or lets you see them" arrow>
+                            <Tooltip title={t("tooltips.reorder-button")} arrow>
                                 <Fab size="medium" color="secondary" aria-label="order" onClick={changeVisible}>
                                     <ReorderIcon />
                                 </Fab>

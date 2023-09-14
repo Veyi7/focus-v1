@@ -65,6 +65,7 @@ import { getAuth, signOut } from "firebase/auth";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 
+import { useTranslation } from 'react-i18next';
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -183,6 +184,16 @@ const Calendar = () => {
 
     const navigate = useNavigate();
 
+    const { t, i18n } = useTranslation('global');
+
+    const [language, setLanguage] = React.useState('en');
+  
+    const handleChange = (event) => {
+        setLanguage(event.target.value);
+  
+        i18n.changeLanguage(event.target.value);
+    };
+
     function handleClose() {
         setMessageOpen(!openMessage);
     }
@@ -246,17 +257,17 @@ const Calendar = () => {
                                         aria-describedby="alert-dialog-description"
                                     >
                                         <DialogTitle id="alert-dialog-title">
-                                            {"Do you really want to erase this task?"}
+                                            {t("erase-dialog.title")}
                                         </DialogTitle>
                                         <DialogContent>
                                             <DialogContentText id="alert-dialog-description">
-                                                You won't be able to recover this task, unless you create it back.
+                                                {t("erase-dialog.subtitle")}
                                             </DialogContentText>
                                         </DialogContent>
                                         <DialogActions>
-                                        <Button onClick={handleClose}>Disagree</Button>
+                                        <Button onClick={handleClose}>{t("erase-dialog.disagree-button")}</Button>
                                         <Button onClick={handleErase} autoFocus>
-                                            Agree
+                                            {t("erase-dialog.agree-button")}
                                         </Button>
                                         </DialogActions>
                                     </Dialog>
@@ -286,7 +297,7 @@ const Calendar = () => {
                         <Collapse in={expanded} timeout="auto" unmountOnExit>
                             <CardContent>                               
                                 <Typography variant="body2" color="text.secondary">
-                                    Creation Date: {actualTask.creationDateTime}
+                                    {t("task.creation-date")} {actualTask.creationDateTime}
                                 </Typography>
                             </CardContent>
                         </Collapse>
@@ -394,7 +405,7 @@ const Calendar = () => {
                             subheader = {
                                 <ListSubheader component="div" id="nested-list-subheader">
                                     <Typography variant="h6" color="text.secondary">
-                                        Mini Tasks
+                                        {t("task.miniTask-list")}
                                     </Typography>
                                 </ListSubheader>
                             }
@@ -406,9 +417,7 @@ const Calendar = () => {
             }
             else {
                 return (
-                    <Typography variant="body2" color="text.secondary">
-                        Done: {isDone(actualTask.done)}
-                    </Typography>
+                    <LinearProgress variant="determinate" value={(actualTask.done)*100}/>
                 );
             }
         }
@@ -555,7 +564,7 @@ const Calendar = () => {
                                 <MenuIcon />
                             </IconButton>
                             <Typography variant="h6" noWrap component="div">
-                                Calendar
+                                {t("header.calendar")}
                             </Typography>
                             </Toolbar>
                         </AppBar>
@@ -567,14 +576,14 @@ const Calendar = () => {
                             </DrawerHeader>
                             <Divider />
                             <List>
-                                {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
+                                {[ t("header.home") , t("header.calendar"), t("header.pomodoros"), 'Adjustments'].map((text, index) => (
                                     <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                                         <ListItemButton
                                             sx={{
                                             minHeight: 48,
                                             justifyContent: open ? 'initial' : 'center',
                                             px: 2.5,
-                                            }}
+                                            }} 
                                             component={Link} to={linkage(index)}
                                         >
                                             <ListItemIcon
@@ -590,7 +599,7 @@ const Calendar = () => {
                                         </ListItemButton>
                                     </ListItem>
                                 ))}
-                                <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20, left: 0 }}>
+                                <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
                                     <ListItemButton
                                     sx={{
                                         minHeight: 48,
@@ -606,7 +615,7 @@ const Calendar = () => {
                                         }}>
                                             <LogoutIcon/>
                                         </ListItemIcon>
-                                        <ListItemText primary={"Sign-Out"} sx={{ opacity: open ? 1 : 0 }} />
+                                        <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
                                     </ListItemButton>
                                 </ListItem>
                             </List>

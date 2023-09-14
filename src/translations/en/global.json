@@ -1,0 +1,54 @@
+{
+    "header" : {
+        "home" : "Home",
+        "calendar" : "Calendar",
+        "pomodoros" : "Pomodoros",
+        "sign-out" : "Sign-Out",
+        "modify" : "Modify",
+        "create" : "Create"
+    },
+
+    "tooltips" : {
+        "create-button" : "Opens the creation Task window",
+        "reorder-button" : "Cleans the list of tasks from past events or lets you see them",
+        "done-button" : "Mark the task as Done",
+        "todo-button" : "Mark the task as To Do"
+    },
+
+    "task" : {
+        "creation-date" : "Creation Date:",
+        "title" : "Title",
+        "description" : "Description",
+        "miniTask" : "MiniTask",
+        "add-miniTask" : "ADD MINITASK",
+        "create" : "CREATE",
+        "cancel" : "CANCEL",
+        "create-title" : "Create a New Task",
+        "modify" : "SAVE CHANGES",
+        "modify-title" : "Modify a Task",
+        "miniTask-list" : "MiniTask List", 
+        "no-tasks-phrase" : "You can start by creating a new task by clicking on the + button"
+    },
+
+    "pomodoro" : {
+        "adjustments-button": "ADJUSTMENTS",
+        "work-minutes": "Work Minutes: ",
+        "rest-minutes": "Rest Minutes: ",
+        "confirm-button": "CONFIRM"
+    },
+
+    "erase-dialog" : {
+        "title" : "Do you really want to erase this task?",
+        "subtitle" : "You won't be able to recover this task, unless you create it back.",
+        "agree-button" : "AGREE",
+        "disagree-button" : "DISAGREE"
+    },
+
+    "login" : {
+        "title":"Log In",
+        "button-text":"Log In with Google",
+        "language" : "Language"
+    }
+
+
+}

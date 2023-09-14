@@ -39,6 +39,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 
+import { useTranslation } from 'react-i18next';
 
 const ExpandMore = styled((props) => {
 const { expand, ...other } = props;
@@ -131,11 +132,22 @@ const Pomodoro = () => {
     const isPausedRef = useRef(isPaused);
     const modeRef = useRef(mode);
 
+    const { t, i18n } = useTranslation('global');
+
+    const [language, setLanguage] = React.useState('en');
+
+    const handleChange = (event) => {
+        setLanguage(event.target.value);
+
+        i18n.changeLanguage(event.target.value);
+    };
+
+
     const Settings = () => {
         return(
             <div style={{textAlign:'left'}}>
                 <div>
-                    <Typography variant="h4">Work Minutes: {work}:00</Typography>
+                    <Typography variant="h5">{t("pomodoro.work-minutes")} {work}:00</Typography>
                     <Slider aria-label="Work Minutes"
                         value={work}
                         valueLabelDisplay="auto"
@@ -147,7 +159,7 @@ const Pomodoro = () => {
                     />
                 </div>
                 <div>
-                    <Typography variant="h4">Rest Minutes: {rest}:00</Typography>
+                    <Typography variant="h5">{t("pomodoro.rest-minutes")} {rest}:00</Typography>
                     <Slider aria-label="Rest Minutes"
                         value={rest}
                         valueLabelDisplay="auto"
@@ -157,7 +169,7 @@ const Pomodoro = () => {
                         onChange={(newValue) => setRest(newValue.target.value)}
                     />
                 </div>
-                <Button variant="contained" onClick={() => setShowSettings(!showSettings)}>Confirm</Button>
+                <Button variant="contained" onClick={() => setShowSettings(!showSettings)}>{t("pomodoro.confirm-button")}</Button>
                 
             </div>
         );
@@ -180,7 +192,7 @@ const Pomodoro = () => {
                             <PauseIcon/>
                         </IconButton>
                     </Stack>
-                    <Button sx={{ marginTop: '30px' }} variant="outlined" startIcon={<SettingsIcon />} onClick={() => {setShowSettings(!showSettings); handlePause(); initTimer();}}>Adjustments</Button>
+                    <Button sx={{ marginTop: '30px' }} variant="outlined" startIcon={<SettingsIcon />} onClick={() => {setShowSettings(!showSettings); handlePause(); initTimer();}}>{t("pomodoro.adjustments-button")}</Button>
                 </Box>
             </div>
             
@@ -304,7 +316,7 @@ const Pomodoro = () => {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
-                        Pomodoros
+                        {t("header.pomodoros")}
                     </Typography>
                     </Toolbar>
                 </AppBar>
@@ -316,7 +328,7 @@ const Pomodoro = () => {
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
+                        {[ t("header.home") , t("header.calendar"), t("header.pomodoros"), 'Adjustments'].map((text, index) => (
                             <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                                 <ListItemButton
                                     sx={{
@@ -355,7 +367,7 @@ const Pomodoro = () => {
                                 }}>
                                     <LogoutIcon/>
                                 </ListItemIcon>
-                                <ListItemText primary={"Sign-Out"} sx={{ opacity: open ? 1 : 0 }} />
+                                <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
                             </ListItemButton>
                         </ListItem>
                     </List>

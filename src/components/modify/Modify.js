@@ -40,6 +40,8 @@ import { getAuth, signOut } from "firebase/auth";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 
+import { useTranslation } from 'react-i18next';
+
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
     return <IconButton {...other} />;
@@ -118,24 +120,34 @@ const ExpandMore = styled((props) => {
   );
 
 const Modify = () => {
-    const theme = useTheme();
-    const [open, setOpen] = React.useState(false);
-    const { id } = useParams();
-    const [actualTask, setActualTask] = useState([]);
-    const [title, setTitle]  = useState("");
-    const [description, setDescription]  = useState("");
-    const [miniTasks, setMiniTasks] = useState([]);
-    const [value, setValue] = useState(dayjs());
-    const [actualMiniTask, setActualMiniTask] = useState([]);
-    const [done, setDone] = useState(false);
+  const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
+  const { id } = useParams();
+  //const [actualTask, setActualTask] = useState([]);
+  const [title, setTitle]  = useState("");
+  const [description, setDescription]  = useState("");
+  const [miniTasks, setMiniTasks] = useState([]);
+  const [value, setValue] = useState(dayjs());
+  const [actualMiniTask, setActualMiniTask] = useState([]);
+  const [done, setDone] = useState(false);
 
-    const [tasks, setTasks] = React.useState([]);
+  const [tasks, setTasks] = React.useState([]);
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleDescription = (description) => {
-      //console.log(description); 
-      setDescription(description.toString());
+  const { t, i18n } = useTranslation('global');
+
+  const [language, setLanguage] = React.useState('en');
+
+  const handleChange = (event) => {
+      setLanguage(event.target.value);
+
+      i18n.changeLanguage(event.target.value);
+  };
+
+  const handleDescription = (description) => {
+    //console.log(description); 
+    setDescription(description.toString());
   };
 
   const handleTitle = (title) => {
@@ -318,73 +330,73 @@ const Modify = () => {
                       <MenuIcon />
                   </IconButton>
                   <Typography variant="h6" noWrap component="div">
-                      Modify
+                      {t("header.modify")}
                   </Typography>
                   </Toolbar>
               </AppBar>
               <Drawer variant="permanent" open={open}>
-                  <DrawerHeader>
-                  <IconButton onClick={handleDrawerOpen}>
-                      {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                  </IconButton>
-                  </DrawerHeader>
-                  <Divider />
-                  <List>
-                      {['Home', 'Calendar', 'Pomodoros', 'Adjustments'].map((text, index) => (
-                          <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                              <ListItemButton
-                                  sx={{
-                                  minHeight: 48,
-                                  justifyContent: open ? 'initial' : 'center',
-                                  px: 2.5,
-                                  }} 
-                                  component={Link} to={linkage(index)}
+                <DrawerHeader>
+                <IconButton onClick={handleDrawerOpen}>
+                    {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                </IconButton>
+                </DrawerHeader>
+                <Divider />
+                <List>
+                  {[ t("header.home") , t("header.calendar"), t("header.pomodoros"), 'Adjustments'].map((text, index) => (
+                      <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                          <ListItemButton
+                              sx={{
+                              minHeight: 48,
+                              justifyContent: open ? 'initial' : 'center',
+                              px: 2.5,
+                              }} 
+                              component={Link} to={linkage(index)}
+                          >
+                              <ListItemIcon
+                              sx={{
+                                  minWidth: 0,
+                                  mr: open ? 3 : 'auto',
+                                  justifyContent: 'center',
+                              }}
                               >
-                                  <ListItemIcon
-                                  sx={{
-                                      minWidth: 0,
-                                      mr: open ? 3 : 'auto',
-                                      justifyContent: 'center',
-                                  }}
-                                  >
-                                      {handleIcon(index)}
-                                  </ListItemIcon>
-                                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                              </ListItemButton>
-                          </ListItem>
-                      ))}
-                      <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
-                            <ListItemButton
-                            sx={{
-                                minHeight: 48,
-                                justifyContent: open ? 'initial' : 'center',
-                                px: 2.5,
-                            }} 
-                            onClick={() => signOutButton()}>
-                                <ListItemIcon
-                                sx={{
-                                    minWidth: 0,
-                                    mr: open ? 3 : 'auto',
-                                    justifyContent: 'center',
-                                }}>
-                                    <LogoutIcon/>
-                                </ListItemIcon>
-                                <ListItemText primary={"Sign-Out"} sx={{ opacity: open ? 1 : 0 }} />
-                            </ListItemButton>
-                        </ListItem>
-                  </List>
+                                  {handleIcon(index)}
+                              </ListItemIcon>
+                              <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                          </ListItemButton>
+                      </ListItem>
+                  ))}
+                  <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+                      <ListItemButton
+                      sx={{
+                          minHeight: 48,
+                          justifyContent: open ? 'initial' : 'center',
+                          px: 2.5,
+                      }} 
+                      onClick={() => signOutButton()}>
+                          <ListItemIcon
+                          sx={{
+                              minWidth: 0,
+                              mr: open ? 3 : 'auto',
+                              justifyContent: 'center',
+                          }}>
+                              <LogoutIcon/>
+                          </ListItemIcon>
+                          <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
+                      </ListItemButton>
+                  </ListItem>
+                </List>
               </Drawer>
               <Box sx={{ marginLeft: '20px', marginTop: '90px'}}>
                 <div>
                     <Typography variant="h4">
-                        Modify a Task
+                        {t("task.modify-title")}
                     </Typography>
                 </div>
                 <div className='spacing'>
                     <TextField
                         required
                         id="task-title"
-                        label="Title"
+                        label={t("task.title")}
                         value={title}
                         onChange={(event) => handleTitle(event.target.value)}
                     />
@@ -399,7 +411,7 @@ const Modify = () => {
                 <div>
                     <TextField
                         id="task-description"
-                        label="Description"
+                        label={t("task.description")}
                         fullWidth 
                         value={description}
                         onChange={(event) => handleDescription(event.target.value)}
@@ -409,13 +421,13 @@ const Modify = () => {
                 <div className='spacing'>
                     <TextField
                         id="miniTask-title"
-                        label="MiniTask"
+                        label={t("task.miniTask")}
                         value={actualMiniTask}
                         fullWidth
                         onChange={(event) => setActualMiniTask(event.target.value)}
                         margin="normal"
                     />
-                    <Button variant="contained" onClick={addMiniTask}>Add MiniTask</Button>
+                    <Button variant="contained" onClick={addMiniTask}>{t("task.add-miniTask")}</Button>
                 </div>
                 <div className='spacing'>
                   <List>
@@ -423,8 +435,8 @@ const Modify = () => {
                   </List>
                 </div>
                 <div>
-                    <Button variant="contained" onClick={modifyTask}>Modify Task</Button>
-                    <Button component={Link} to={"/home"}>Cancel</Button>
+                    <Button variant="contained" onClick={modifyTask}>{t("task.modify")}</Button>
+                    <Button component={Link} to={"/home"}>{t("task.cancel")}</Button>
                 </div>
               </Box>
             </Box>

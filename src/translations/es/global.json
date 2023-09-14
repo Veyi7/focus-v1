@@ -1,0 +1,52 @@
+{
+    "header" : {
+        "home" : "Pantalla Principal",
+        "calendar" : "Calendario",
+        "pomodoros" : "Método Pomodoro",
+        "sign-out" : "Desconectarse",
+        "modify" : "Modificar",
+        "create" : "Crear"
+    },
+
+    "tooltips" : {
+        "create-button" : "Abre la pestaña de creación de Tareas",
+        "reorder-button" : "Limpia la lista de tareas de eventos pasados o te los deja ver",
+        "done-button" : "Marca la tarea como Hecha",
+        "todo-button" : "Marca la tarea como Pendiente"
+    },
+
+    "task" : {
+        "creation-date" : "Fecha de creación:",
+        "title" : "Título",
+        "description" : "Descripción",
+        "miniTask" : "MiniTarea",
+        "add-miniTask" : "AÑADIR MINITAREA",
+        "create" : "CREAR",
+        "cancel" : "CANCELAR",
+        "create-title" : "Crea una nueva Tarea",
+        "modify" : "GUARDA LOS CAMBIOS",
+        "modify-title" : "Modifica una Tarea",
+        "miniTask-list" : "Lista de MiniTareas", 
+        "no-tasks-phrase" : "Puedes empezar creando una nueva tarea pulsando el botón +"
+    },
+
+    "pomodoro" : {
+        "adjustments-button" : "Ajustes",
+        "work-minutes" : "Minutos de Trabajo: ",
+        "rest-minutes" : "Minutos de Descanso: ",
+        "confirm-button" : "CONFIRMAR"
+    },
+
+    "erase-dialog" : {
+        "title" : "¿Quieres borrar esta tarea?",
+        "subtitle" : "No podrás recuperarla, a no ser que la crees de nuevo.",
+        "agree-button" : "BORRAR",
+        "disagree-button" : "CANCELAR"
+    },
+
+    "login" : {
+        "title" : "Iniciar sesión",
+        "button-text" : "Iniciar sesión con Google",
+        "language" : "Idioma"
+    }
+}

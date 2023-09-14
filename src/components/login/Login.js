@@ -1,19 +1,29 @@
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { signInWithRedirect, signInWithPopup } from "firebase/auth";
-import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+
+import { useTranslation } from 'react-i18next';
+
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import { Typography } from '@mui/material';
 
 const Login = () => {
+    const { t, i18n } = useTranslation('global');
+
+    const [language, setLanguage] = React.useState('en');
+
+    const handleChange = (event) => {
+        setLanguage(event.target.value);
+
+        i18n.changeLanguage(event.target.value);
+    };
 
     const navigate = useNavigate();
-
-    const handleRedirect = async () => {
-        const provider = new GoogleAuthProvider();
-        const auth = getAuth();
-
-        signInWithRedirect(auth, provider);
-        navigate('/home');
-        
-    }
 
     const signInWithPopUp = async () => {
         const provider = new GoogleAuthProvider();
@@ -38,9 +48,25 @@ const Login = () => {
 
     return (
         <div>
-            <h2>Iniciar sesión con Google</h2>
-            {/* <button onClick={handleRedirect}>Iniciar sesión con Google</button> */}
-            <button onClick={handlePopUp}>Iniciar sesión en un PopUp</button>
+            <Box>
+                <Typography variant='h2' >
+                    { t("login.title") }
+                </Typography>
+                <br />
+                <FormControl>
+                    <InputLabel id="demo-simple-select-label">{ t("login.language") }</InputLabel>
+                    <Select
+                        value={language}
+                        label="language"
+                        onChange={handleChange}
+                    >
+                    <MenuItem value={'en'}>English</MenuItem>
+                    <MenuItem value={'es'}>Español</MenuItem>
+                    <MenuItem value={'cat'}>Català</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
+            <button onClick={handlePopUp}>{ t("login.button-text") }</button>
         </div>
     );
 };
