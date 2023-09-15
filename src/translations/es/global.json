@@ -45,8 +45,12 @@
     },
 
     "login" : {
-        "title" : "Iniciar sesión",
+        "title" : "La aplicación que te ayuda a centrarte en lo que te es más importante",
         "button-text" : "Iniciar sesión con Google",
-        "language" : "Idioma"
+        "language" : "Idioma",
+        "text-1" : "Focus es una app creada para mi proyecto final de carrera, y está creada esperando ayudar a gente a la que, como yo, encontrar el orden y la concentración en su trabajo o estudios es la parte más difícil.",
+        "text-2" : "Así que, desde mi experiencia personal, he intentado crear una app que la gente con mi mismo problema pueda encontrar útil.",
+        "text-3" : "¡Si quieres probar la app y descubrir por ti mismo si cumple tus necesidades, empieza iniciando sesión!",
+        "start-by" : "Empieza iniciando sesión aquí:"
     }
 }

@@ -45,9 +45,13 @@
     },
 
     "login" : {
-        "title":"Log In",
+        "title":"The app that helps you focus on what is important to you",
         "button-text":"Log In with Google",
-        "language" : "Language"
+        "language" : "Language",
+        "text-1" : "Focus is an app created as my degree's final project and it's created aming to help people that, like me, find searching for order and concentration on their work or studies the most difficult task each time they try.",
+        "text-2" : "So, from my personal experience, I tried to make an app that people with my same problem might find helpful.",
+        "text-3" : "If you want to try the app and find by yourself if it suits your needs, just start by Logging In!",
+        "start-by" : "Start by Logging In here:"
     }
 
 

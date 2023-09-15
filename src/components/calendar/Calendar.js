@@ -182,6 +182,8 @@ const Calendar = () => {
     const [tasks, setTasks] = React.useState([]);
     const [actualTask, setActualTask] = React.useState([]);
 
+    const [reload, setReload] = useState(false);
+
     const navigate = useNavigate();
 
     const { t, i18n } = useTranslation('global');
@@ -215,6 +217,7 @@ const Calendar = () => {
             setTasks(response.data);
             const aux = response.data.map(task => dayjs(task.startDateTime));
             setHighlightedDays(aux);
+            console.log(aux);
         } 
         catch(err){
             console.log(err);
@@ -526,7 +529,13 @@ const Calendar = () => {
         if (tasks.length === 0) {
             getListTasks();
         }
-    },[]);
+        if (reload) {
+            console.log("reload");
+            getListTasks();
+            
+            setReload(!reload);
+        }
+    },[reload]);
 
     if (!tasks) {
         return (
