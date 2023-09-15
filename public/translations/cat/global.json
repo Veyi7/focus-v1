@@ -1,0 +1,57 @@
+{
+    "header" : {
+        "home" : "Pantalla Principal",
+        "calendar" : "Calendari",
+        "pomodoros" : "Mètode Pomodoro",
+        "sign-out" : "Desconnectar-se",
+        "modify" : "Modificar",
+        "create" : "Crear"
+    },
+
+    "tooltips" : {
+        "create-button" : "Obre la pestanya de creació de tasques",
+        "reorder-button" : "Neteja la llista de tasques d'esdeveniments passats o te'ls deixa veure",
+        "done-button" : "Marca la tasca com Feta",
+        "todo-button" : "Marca la tasca com Pendent"
+    },
+
+    "task" : {
+        "creation-date" : "Data de creació:",
+        "title" : "Títol",
+        "description" : "Descripció",
+        "miniTask" : "MiniTasca",
+        "add-miniTask" : "AFEGIR MINITASCA",
+        "create" : "CREAR",
+        "cancel" : "CANCELAR",
+        "create-title" : "Crea una nova Tasca",
+        "modify" : "DESA ELS CANVIS",
+        "modify-title" : "Modifica una Tasca",
+        "miniTask-list" : "Llista de MiniTasques", 
+        "no-tasks-phrase" : "Pots començar per crear una nova tasca fent clic al botó +"
+    },
+
+    "pomodoro" : {
+        "adjustments-button" : "Ajustaments",
+        "work-minutes" : "Minuts de Treball: ",
+        "rest-minutes" : "Minuts de Descans: ",
+        "confirm-button" : "CONFIRMAR"
+    },
+
+    "erase-dialog" : {
+        "title" : "Vols esborrar aquesta tasca?",
+        "subtitle" : "No podràs recuperar-la, llevat que la creïs de nou.",
+        "agree-button" : "ESBORRAR",
+        "disagree-button" : "CANCELAR"
+    },
+
+    "login" : {
+        "title" : "L'App que t'ajuda a concentrar-te en el que és més important per tu",
+        "button-text" : "Iniciar sessió amb Google",
+        "language" : "Idioma",
+        "text-1" : "Focus és una App creada pel meu treball de fi de grau i està pensada per ajudar a gent que, com jo, troben que buscar la concentració i l'ordre al seu treball o als estudis és la tasca més difícil cada cop que es posen.",
+        "text-2" : "Així que, des de la meva experiència personal, he tractat de fer una app que la gent amb el meu mateix problema trobi útil.",
+        "text-3" : "Si vols provar l'App i descobrir per tu mateix si compleix les teves necessitats, comença per iniciar sessió!",
+        "start-by" : "Comença iniciant sessió aquí:"
+    }
+    
+}
