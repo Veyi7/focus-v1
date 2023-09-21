@@ -5,12 +5,10 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 import { useTranslation } from 'react-i18next';
 
-import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { Typography } from '@mui/material';
 
 const Login = () => {
     const { t, i18n } = useTranslation('global');

@@ -358,7 +358,7 @@ const Pomodoro = () => {
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {[ t("header.home") , t("header.calendar"), t("header.pomodoros"), 'Adjustments'].map((text, index) => (
+                        {[ t("header.home") , t("header.calendar"), t("header.pomodoros")].map((text, index) => (
                             <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                                 <ListItemButton
                                     sx={{
