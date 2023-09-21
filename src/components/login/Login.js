@@ -19,7 +19,7 @@ const Login = () => {
 
     const handleChange = (event) => {
         setLanguage(event.target.value);
-
+        localStorage.setItem("lng", event.target.value);
         i18n.changeLanguage(event.target.value);
     };
 
@@ -35,7 +35,7 @@ const Login = () => {
             const token = credential.accessToken;
             const user = result.user;
             localStorage.setItem("userInfo", user.uid);
-
+            localStorage.setItem("lng", language);
             navigate('/home');
         }).catch((error) => {
             console.log('Error al iniciar sesión con Google', error);

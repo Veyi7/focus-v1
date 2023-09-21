@@ -139,17 +139,17 @@ const Home = () => {
 
     const [language, setLanguage] = React.useState('en');
 
-    const handleChange = (event) => {
-        setLanguage(event.target.value);
+    const handleChange = (lng) => {
+        setLanguage(lng);
 
-        i18n.changeLanguage(event.target.value);
+        i18n.changeLanguage(lng);
     };
 
     const navigate = useNavigate();
 
     const getListTasks = async() => {
         const user = localStorage.getItem("userInfo");
-
+        
         if (user) {
             if (user != "") {
                 await getTasks(user);
@@ -451,7 +451,10 @@ const Home = () => {
     }
 
     useEffect(() => {
-        
+        const lng = localStorage.getItem("lng");
+        if (language != lng) {
+            handleChange(lng);
+        }
     },[]);
 
     if (!tasks) {

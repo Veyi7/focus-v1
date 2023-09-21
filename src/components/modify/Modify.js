@@ -35,6 +35,8 @@ import dayjs from 'dayjs';
 import Button from '@mui/material/Button';
 import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
 
+import Alert from '@mui/material/Alert';
+
 //SignOutButton
 import { getAuth, signOut } from "firebase/auth";
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -131,6 +133,8 @@ const Modify = () => {
   const [actualMiniTask, setActualMiniTask] = useState([]);
   const [done, setDone] = useState(false);
 
+  const [empty, setEmpty] = useState(false);
+
   const [tasks, setTasks] = React.useState([]);
 
   const navigate = useNavigate();
@@ -139,10 +143,10 @@ const Modify = () => {
 
   const [language, setLanguage] = React.useState('en');
 
-  const handleChange = (event) => {
-      setLanguage(event.target.value);
+  const handleChange = (lng) => {
+    setLanguage(lng);
 
-      i18n.changeLanguage(event.target.value);
+    i18n.changeLanguage(lng);
   };
 
   const handleDescription = (description) => {
@@ -287,159 +291,255 @@ const Modify = () => {
       }
     };
 
+    const errorModify = () => {
+      if (empty) {
+        return (
+          <Box sx={{ display: 'flex' }}>
+            <CssBaseline />
+            <AppBar position="fixed" open={open}>
+                <Toolbar>
+                <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    onClick={handleDrawerOpen}
+                    edge="start"
+                    sx={{
+                    marginRight: 5,
+                    ...(open && { display: 'none' }),
+                    }}
+                >
+                    <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" noWrap component="div">
+                    {t("header.modify")}
+                </Typography>
+                </Toolbar>
+            </AppBar>
+            <Drawer variant="permanent" open={open}>
+              <DrawerHeader>
+              <IconButton onClick={handleDrawerOpen}>
+                  {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              </IconButton>
+              </DrawerHeader>
+              <Divider />
+              <List>
+                {[ t("header.home") , t("header.calendar"), t("header.pomodoros"), 'Adjustments'].map((text, index) => (
+                    <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton
+                            sx={{
+                            minHeight: 48,
+                            justifyContent: open ? 'initial' : 'center',
+                            px: 2.5,
+                            }} 
+                            component={Link} to={linkage(index)}
+                        >
+                            <ListItemIcon
+                            sx={{
+                                minWidth: 0,
+                                mr: open ? 3 : 'auto',
+                                justifyContent: 'center',
+                            }}
+                            >
+                                {handleIcon(index)}
+                            </ListItemIcon>
+                            <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+                <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+                    <ListItemButton
+                    sx={{
+                        minHeight: 48,
+                        justifyContent: open ? 'initial' : 'center',
+                        px: 2.5,
+                    }} 
+                    onClick={() => signOutButton()}>
+                        <ListItemIcon
+                        sx={{
+                            minWidth: 0,
+                            mr: open ? 3 : 'auto',
+                            justifyContent: 'center',
+                        }}>
+                            <LogoutIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
+                    </ListItemButton>
+                </ListItem>
+              </List>
+            </Drawer>
+            <Alert className="mx-10 my-24" severity="error">Don't try to access other people's data!</Alert>
+          </Box>
+        );
+      }
+      else {
+        return modificationBody();
+      }
+    };
+
     const getTasks = async (uid) => {
       try {
-          const response = await api.get('/task/user?user_id='+uid);
-          setTasks(response.data);
-          const idInt = parseInt(id);
-          const aux = response.data.filter(task => task.id === idInt);
+        const response = await api.get('/task/user?user_id='+uid);
+        setTasks(response.data);
+        const idInt = parseInt(id);
+        const aux = response.data.filter(task => task.id === idInt);
+        if (aux.length === 0) {
+          setEmpty(true);
+        }
+        else {
           aux.map((task) => setValues(task));
+        }
       } 
       catch(err){
           console.log(err);
       }
     };
 
-    useEffect(() => {
-      if (tasks.length === 0) {
-        getListTasks();
-      }
-      // if (tasks) {
-      //   const idInt = parseInt(id);
-      //   const aux = tasks.filter(task => task.id === idInt);
-      //   aux.map((task) => setValues(task));
-      // }
-    },[]);
-
-    return (
-        <div>
-            <Box sx={{ display: 'flex' }}>
-              <CssBaseline />
-              <AppBar position="fixed" open={open}>
-                  <Toolbar>
-                  <IconButton
-                      color="inherit"
-                      aria-label="open drawer"
-                      onClick={handleDrawerOpen}
-                      edge="start"
-                      sx={{
-                      marginRight: 5,
-                      ...(open && { display: 'none' }),
-                      }}
-                  >
-                      <MenuIcon />
-                  </IconButton>
-                  <Typography variant="h6" noWrap component="div">
-                      {t("header.modify")}
-                  </Typography>
-                  </Toolbar>
-              </AppBar>
-              <Drawer variant="permanent" open={open}>
-                <DrawerHeader>
-                <IconButton onClick={handleDrawerOpen}>
-                    {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                </IconButton>
-                </DrawerHeader>
-                <Divider />
-                <List>
-                  {[ t("header.home") , t("header.calendar"), t("header.pomodoros"), 'Adjustments'].map((text, index) => (
-                      <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                          <ListItemButton
-                              sx={{
-                              minHeight: 48,
-                              justifyContent: open ? 'initial' : 'center',
-                              px: 2.5,
-                              }} 
-                              component={Link} to={linkage(index)}
-                          >
-                              <ListItemIcon
-                              sx={{
-                                  minWidth: 0,
-                                  mr: open ? 3 : 'auto',
-                                  justifyContent: 'center',
-                              }}
-                              >
-                                  {handleIcon(index)}
-                              </ListItemIcon>
-                              <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                          </ListItemButton>
-                      </ListItem>
-                  ))}
-                  <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+    const modificationBody = () => {
+      return (
+        <Box sx={{ display: 'flex' }}>
+          <CssBaseline />
+          <AppBar position="fixed" open={open}>
+              <Toolbar>
+              <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={handleDrawerOpen}
+                  edge="start"
+                  sx={{
+                  marginRight: 5,
+                  ...(open && { display: 'none' }),
+                  }}
+              >
+                  <MenuIcon />
+              </IconButton>
+              <Typography variant="h6" noWrap component="div">
+                  {t("header.modify")}
+              </Typography>
+              </Toolbar>
+          </AppBar>
+          <Drawer variant="permanent" open={open}>
+            <DrawerHeader>
+            <IconButton onClick={handleDrawerOpen}>
+                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            </IconButton>
+            </DrawerHeader>
+            <Divider />
+            <List>
+              {[ t("header.home") , t("header.calendar"), t("header.pomodoros"), 'Adjustments'].map((text, index) => (
+                  <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                       <ListItemButton
-                      sx={{
+                          sx={{
                           minHeight: 48,
                           justifyContent: open ? 'initial' : 'center',
                           px: 2.5,
-                      }} 
-                      onClick={() => signOutButton()}>
+                          }} 
+                          component={Link} to={linkage(index)}
+                      >
                           <ListItemIcon
                           sx={{
                               minWidth: 0,
                               mr: open ? 3 : 'auto',
                               justifyContent: 'center',
-                          }}>
-                              <LogoutIcon/>
+                          }}
+                          >
+                              {handleIcon(index)}
                           </ListItemIcon>
-                          <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
+                          <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
                       </ListItemButton>
                   </ListItem>
-                </List>
-              </Drawer>
-              <Box sx={{ marginLeft: '20px', marginTop: '90px'}}>
-                <div>
-                    <Typography variant="h4">
-                        {t("task.modify-title")}
-                    </Typography>
-                </div>
-                <div className='spacing'>
-                    <TextField
-                        required
-                        id="task-title"
-                        label={t("task.title")}
-                        value={title}
-                        onChange={(event) => handleTitle(event.target.value)}
+              ))}
+              <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+                  <ListItemButton
+                  sx={{
+                      minHeight: 48,
+                      justifyContent: open ? 'initial' : 'center',
+                      px: 2.5,
+                  }} 
+                  onClick={() => signOutButton()}>
+                      <ListItemIcon
+                      sx={{
+                          minWidth: 0,
+                          mr: open ? 3 : 'auto',
+                          justifyContent: 'center',
+                      }}>
+                          <LogoutIcon/>
+                      </ListItemIcon>
+                      <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
+                  </ListItemButton>
+              </ListItem>
+            </List>
+          </Drawer>
+          <Box sx={{ marginLeft: '20px', marginTop: '90px'}}>
+            <div>
+                <Typography variant="h4">
+                    {t("task.modify-title")}
+                </Typography>
+            </div>
+            <div className='spacing'>
+                <TextField
+                    required
+                    id="task-title"
+                    label={t("task.title")}
+                    value={title}
+                    onChange={(event) => handleTitle(event.target.value)}
+                />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateTimePicker
+                        label="Date and Time Picker"
+                        value={value}
+                        onChange={(newValue) => setValue(newValue)}
                     />
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateTimePicker
-                            label="Date and Time Picker"
-                            value={value}
-                            onChange={(newValue) => setValue(newValue)}
-                        />
-                    </LocalizationProvider>
-                </div>
-                <div>
-                    <TextField
-                        id="task-description"
-                        label={t("task.description")}
-                        fullWidth 
-                        value={description}
-                        onChange={(event) => handleDescription(event.target.value)}
-                        margin="normal"
-                    />
-                </div>
-                <div className='spacing'>
-                    <TextField
-                        id="miniTask-title"
-                        label={t("task.miniTask")}
-                        value={actualMiniTask}
-                        fullWidth
-                        onChange={(event) => setActualMiniTask(event.target.value)}
-                        margin="normal"
-                    />
-                    <Button variant="contained" onClick={addMiniTask}>{t("task.add-miniTask")}</Button>
-                </div>
-                <div className='spacing'>
-                  <List>
-                      {miniTaskList(miniTasks)}
-                  </List>
-                </div>
-                <div>
-                    <Button variant="contained" onClick={modifyTask}>{t("task.modify")}</Button>
-                    <Button component={Link} to={"/home"}>{t("task.cancel")}</Button>
-                </div>
-              </Box>
-            </Box>
+                </LocalizationProvider>
+            </div>
+            <div>
+                <TextField
+                    id="task-description"
+                    label={t("task.description")}
+                    fullWidth 
+                    value={description}
+                    onChange={(event) => handleDescription(event.target.value)}
+                    margin="normal"
+                />
+            </div>
+            <div className='spacing'>
+                <TextField
+                    id="miniTask-title"
+                    label={t("task.miniTask")}
+                    value={actualMiniTask}
+                    fullWidth
+                    onChange={(event) => setActualMiniTask(event.target.value)}
+                    margin="normal"
+                />
+                <Button variant="contained" onClick={addMiniTask}>{t("task.add-miniTask")}</Button>
+            </div>
+            <div className='spacing'>
+              <List>
+                  {miniTaskList(miniTasks)}
+              </List>
+            </div>
+            <div>
+                <Button variant="contained" onClick={modifyTask}>{t("task.modify")}</Button>
+                <Button component={Link} to={"/home"}>{t("task.cancel")}</Button>
+            </div>
+          </Box>
+        </Box>
+      );
+    }
+
+    useEffect(() => {
+      if (tasks.length === 0) {
+        getListTasks();
+      }
+      const lng = localStorage.getItem("lng");
+        if (language != lng) {
+            handleChange(lng);
+      }
+    },[]);
+
+    return (
+        <div>
+          {errorModify()}
+          
         </div>
     );
 }

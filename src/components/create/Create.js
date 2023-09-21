@@ -132,10 +132,10 @@ const Create = () => {
 
     const [language, setLanguage] = React.useState('en');
 
-    const handleChange = (event) => {
-        setLanguage(event.target.value);
-
-        i18n.changeLanguage(event.target.value);
+    const handleChange = (lng) => {
+        setLanguage(lng);
+    
+        i18n.changeLanguage(lng);
     };
 
     const handleDrawerOpen = () => {
@@ -257,6 +257,13 @@ const Create = () => {
             console.log(error);
         })
     }
+
+    useEffect (() => {
+        const lng = localStorage.getItem("lng");
+        if (language != lng) {
+            handleChange(lng);
+        }
+    })
 
     return (
         <div>

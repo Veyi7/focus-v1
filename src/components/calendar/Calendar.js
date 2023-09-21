@@ -252,10 +252,10 @@ const Calendar = () => {
         }
     };
 
-    const handleChange = (event) => {
-        setLanguage(event.target.value);
-  
-        i18n.changeLanguage(event.target.value);
+    const handleChange = (lng) => {
+        setLanguage(lng);
+    
+        i18n.changeLanguage(lng);
     };
 
     function handleClose() {
@@ -597,6 +597,10 @@ const Calendar = () => {
             getListTasks();
             
             setReload(!reload);
+        }
+        const lng = localStorage.getItem("lng");
+        if (language != lng) {
+            handleChange(lng);
         }
     },[reload]);
 

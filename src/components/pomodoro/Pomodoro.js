@@ -148,10 +148,10 @@ const Pomodoro = () => {
 
     const [language, setLanguage] = React.useState('en');
 
-    const handleChange = (event) => {
-        setLanguage(event.target.value);
+    const handleChange = (lng) => {
+        setLanguage(lng);
 
-        i18n.changeLanguage(event.target.value);
+        i18n.changeLanguage(lng);
     };
 
     const progressBarColor = () => {
@@ -255,6 +255,11 @@ const Pomodoro = () => {
 
     useEffect(() => {
         initTimer();
+
+        const lng = localStorage.getItem("lng");
+        if (language != lng) {
+            handleChange(lng);
+        }
 
         const interval = setInterval(() => {
             if (isPausedRef.current) {
