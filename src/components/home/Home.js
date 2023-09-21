@@ -347,8 +347,6 @@ const Home = () => {
                     </Tooltip>
                 );
             }
-            
-
         }
     }
 

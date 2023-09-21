@@ -38,6 +38,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import bellSound from './campana.mp3';
 
 import { useTranslation } from 'react-i18next';
 
@@ -101,6 +102,15 @@ transition: theme.transitions.create(['width', 'margin'], {
 }),
 }));
 
+const RestSlider = styled(Slider)({
+    color:'#009900',
+    height: 10
+});
+
+const WorkSlider = styled(Slider)({
+    height: 10
+});
+
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
 ({ theme, open }) => ({
     width: drawerWidth,
@@ -128,6 +138,8 @@ const Pomodoro = () => {
     const [secondsLeft, setSecondsLeft] = useState(0);
     const [mode, setMode] = useState('work');
 
+    const [audio] = useState(new Audio(bellSound));
+
     const secondsLeftRef = useRef(secondsLeft);
     const isPausedRef = useRef(isPaused);
     const modeRef = useRef(mode);
@@ -142,25 +154,39 @@ const Pomodoro = () => {
         i18n.changeLanguage(event.target.value);
     };
 
+    const progressBarColor = () => {
+        if (mode === 'break') {
+            return (<CircularProgressbar value={percentage} text={minutes+':'+seconds} styles={buildStyles({
+                textColor: '#009900',
+                pathColor: '#009900'
+            })}/>);
+        }
+        else {
+            return (<CircularProgressbar value={percentage} text={minutes+':'+seconds} styles={buildStyles({
+                textColor: '#2196f3',
+                pathColor: '#2196f3'
+            })}/>);
+        }
+    }
 
     const Settings = () => {
         return(
             <div style={{textAlign:'left'}}>
-                <div>
+                <div className='mx-auto my-4'>
                     <Typography variant="h5">{t("pomodoro.work-minutes")} {work}:00</Typography>
-                    <Slider aria-label="Work Minutes"
+                    <WorkSlider aria-label="Work Minutes"
                         value={work}
                         valueLabelDisplay="auto"
                         step={5}
                         marks
-                        min={15}
+                        min={10}
                         max={60}
                         onChange={(newValue) => setWork(newValue.target.value)}
                     />
                 </div>
-                <div>
+                <div className='mx-auto my-4'>
                     <Typography variant="h5">{t("pomodoro.rest-minutes")} {rest}:00</Typography>
-                    <Slider aria-label="Rest Minutes"
+                    <RestSlider aria-label="Rest Minutes"
                         value={rest}
                         valueLabelDisplay="auto"
                         step={1}
@@ -179,10 +205,8 @@ const Pomodoro = () => {
         return (
             <div className='contenedor'>
                 <Box sx={{width: '35%', bgcolor: 'background.paper'}}>
-                    <CircularProgressbar value={percentage} text={minutes+':'+seconds} styles={buildStyles({
-                        textColor: '#2196f3',
-                        pathColor: '#2196f3'
-                    })}/>
+                    
+                    {progressBarColor()}
     
                     <Stack sx={{ marginTop: '30px' }} justifyContent="center" direction="row" spacing={2}>
                         <IconButton onClick={() => handleStart()}>
@@ -238,6 +262,7 @@ const Pomodoro = () => {
             }
 
             if (secondsLeftRef.current === 0) {
+                audio.play();
                 return switchMode();
             }
 

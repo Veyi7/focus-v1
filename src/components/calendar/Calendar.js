@@ -59,6 +59,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 
 //SignOutButton
 import { getAuth, signOut } from "firebase/auth";
@@ -190,6 +191,67 @@ const Calendar = () => {
 
     const [language, setLanguage] = React.useState('en');
   
+
+    const markAsDone = (task) => {
+        if (task.miniTasks) {
+            if (task.miniTasks.length === 0) {
+                if (task.done) {
+                    return (
+                        <Tooltip title={t("tooltips.todo-button")} arrow>
+                            <IconButton aria-label="check"
+                                onClick={() => {changeBoolean(task)}}
+                            >
+                                {isDone(task.done)}
+                            </IconButton>
+                        </Tooltip>
+                    );
+                }
+                else {
+                    return (
+                        <Tooltip title={t("tooltips.done-button")} arrow>
+                            <IconButton aria-label="check"
+                                onClick={() => {changeBoolean(task)}}
+                            >
+                                {isDone(task.done)}
+                            </IconButton>
+                        </Tooltip>
+                    );
+                }
+            }
+        }
+    }
+
+    const changeBoolean = async (task) => {
+        if (task.done === false) {
+            const response = await api.post("/task/update", {
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                date: task.startDateTime,
+                done: true
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            window.location.reload();
+        }
+        else {
+            const response = await api.post("/task/update", {
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                date: task.startDateTime,
+                done: false
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            window.location.reload();
+        }
+    };
+
     const handleChange = (event) => {
         setLanguage(event.target.value);
   
@@ -217,7 +279,6 @@ const Calendar = () => {
             setTasks(response.data);
             const aux = response.data.map(task => dayjs(task.startDateTime));
             setHighlightedDays(aux);
-            console.log(aux);
         } 
         catch(err){
             console.log(err);
@@ -243,6 +304,8 @@ const Calendar = () => {
                         <CardHeader
                             action={
                                 <div>
+                                    {markAsDone(actualTask)}
+                                    
                                     <IconButton aria-label="edit" component={Link} to={'/modify/'+actualTask.id}>
                                         <EditIcon />
                                     </IconButton>
@@ -551,8 +614,6 @@ const Calendar = () => {
     }
 
     else {
-        //console.log({tasks}); 
-
         return (
             <div className="Row">
                 <div className="Column">
