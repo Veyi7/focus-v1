@@ -50,7 +50,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import LinearProgress from '@mui/material/LinearProgress';
-import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
+import api from '../../api/axiosConfig.js';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Dialog from '@mui/material/Dialog';
@@ -673,7 +673,7 @@ const Calendar = () => {
                                         </ListItemButton>
                                     </ListItem>
                                 ))}
-                                <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+                                <ListItem className='block fixed' disablePadding>
                                     <ListItemButton
                                     sx={{
                                         minHeight: 48,

@@ -42,17 +42,6 @@ import bellSound from './campana.mp3';
 
 import { useTranslation } from 'react-i18next';
 
-const ExpandMore = styled((props) => {
-const { expand, ...other } = props;
-return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-marginLeft: 'auto',
-transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-}),
-}));
-
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -138,6 +127,26 @@ const Pomodoro = () => {
     const [secondsLeft, setSecondsLeft] = useState(0);
     const [mode, setMode] = useState('work');
 
+    const [screenWakeLock, setScreenWakeLock] = useState(null);
+
+    const requestScreenWakeLock = async () => {
+        try {
+            const wakeLock = await navigator.wakeLock.request('screen');
+            setScreenWakeLock(wakeLock);
+            console.log('Pantalla activa');
+        } catch (error) {
+            console.error('No se pudo mantener la pantalla activa: ', error);
+        }
+    };
+
+    const releaseScreenWakeLock = () => {
+        if (screenWakeLock) {
+            screenWakeLock.release();
+            setScreenWakeLock(null);
+            console.log('Pantalla desactivada');
+        }
+    };
+
     const [audio] = useState(new Audio(bellSound));
 
     const secondsLeftRef = useRef(secondsLeft);
@@ -209,14 +218,14 @@ const Pomodoro = () => {
                     {progressBarColor()}
     
                     <Stack sx={{ marginTop: '30px' }} justifyContent="center" direction="row" spacing={2}>
-                        <IconButton onClick={() => handleStart()}>
+                        <IconButton onClick={() => {handleStart();  requestScreenWakeLock();}}>
                             <PlayArrowIcon/>
                         </IconButton>
-                        <IconButton onClick={() => handlePause()}> 
+                        <IconButton onClick={() => {handlePause(); releaseScreenWakeLock();}}> 
                             <PauseIcon/>
                         </IconButton>
                     </Stack>
-                    <Button sx={{ marginTop: '30px' }} variant="outlined" startIcon={<SettingsIcon />} onClick={() => {setShowSettings(!showSettings); handlePause(); initTimer();}}>{t("pomodoro.adjustments-button")}</Button>
+                    <Button sx={{ marginTop: '30px' }} variant="outlined" startIcon={<SettingsIcon />} onClick={() => {setShowSettings(!showSettings); handlePause(); initTimer(); releaseScreenWakeLock();}}>{t("pomodoro.adjustments-button")}</Button>
                 </Box>
             </div>
             
@@ -381,7 +390,7 @@ const Pomodoro = () => {
                                 </ListItemButton>
                             </ListItem>
                         ))}
-                        <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+                        <ListItem className='block fixed' disablePadding>
                             <ListItemButton
                             sx={{
                                 minHeight: 48,

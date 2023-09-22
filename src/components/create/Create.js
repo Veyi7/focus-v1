@@ -33,23 +33,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 import Button from '@mui/material/Button';
-import api from 'E:/UNI/TFG/FocusFront/focus-v1/src/api/axiosConfig.js';
+import api from '../../api/axiosConfig.js';
 
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signOut } from "firebase/auth";
 
 import { useTranslation } from 'react-i18next';
-
-const ExpandMore = styled((props) => {
-    const { expand, ...other } = props;
-    return <IconButton {...other} />;
-    })(({ theme, expand }) => ({
-    transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-        duration: theme.transitions.duration.shortest,
-    }),
-}));
 
 const drawerWidth = 240;
 
@@ -319,7 +308,7 @@ const Create = () => {
                                 </ListItemButton>
                             </ListItem>
                         ))}
-                        <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
+                        <ListItem className='block fixed' disablePadding>
                             <ListItemButton
                             sx={{
                                 minHeight: 48,
