@@ -1,7 +1,6 @@
 import './Calendar.css'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
-import Home from '../home/Home';
 
 //Calendar Imports
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
@@ -286,7 +285,7 @@ const Calendar = () => {
     };
 
     const handleErase = async () => {
-        const apiUrl = 'http://localhost:8080/task/delete';
+        const apiUrl = 'https://focustfg-2-production.up.railway.app/task/delete';
         const aux = actualTask.id;
         api.delete(`${apiUrl}?id=${aux}`);
         

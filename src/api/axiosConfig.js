@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export default axios.create({
-    baseURL:'http://192.168.1.90:8080'
+    baseURL:'https://focustfg-2-production.up.railway.app'
 })
