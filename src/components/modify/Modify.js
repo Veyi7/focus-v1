@@ -261,7 +261,9 @@ const Modify = () => {
 
     const modifyTask = async () => {
       if (title != null && title != "") {
+        console.log("pasa1");
           if (value != null) {
+            console.log("pasa2");
             const response = await api.post("/task/update?id="+id+"&title="+title+"&description="+description+"&date="+value.toString()+"&done="+done);
             
             navigate('/home');

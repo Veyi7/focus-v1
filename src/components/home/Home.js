@@ -461,28 +461,28 @@ const Home = () => {
                     <CssBaseline />
                     <AppBar position="fixed" open={open}>
                         <Toolbar>
-                        <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={handleDrawerOpen}
-                            edge="start"
-                            sx={{
-                            marginRight: 5,
-                            ...(open && { display: 'none' }),
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography variant="h6" noWrap component="div">
-                            {t("header.home")}
-                        </Typography>
+                            <IconButton
+                                color="inherit"
+                                aria-label="open drawer"
+                                onClick={handleDrawerOpen}
+                                edge="start"
+                                sx={{
+                                marginRight: 5,
+                                ...(open && { display: 'none' }),
+                                }}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                            <Typography variant="h6" noWrap component="div">
+                                {t("header.home")}
+                            </Typography>
                         </Toolbar>
                     </AppBar>
                     <Drawer variant="permanent" open={open}>
                         <DrawerHeader>
-                        <IconButton onClick={handleDrawerOpen}>
-                            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                        </IconButton>
+                            <IconButton onClick={handleDrawerOpen}>
+                                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                            </IconButton>
                         </DrawerHeader>
                         <Divider />
                         <List>
