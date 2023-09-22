@@ -42,6 +42,8 @@ import bellSound from './campana.mp3';
 
 import { useTranslation } from 'react-i18next';
 
+import Alert from '@mui/material/Alert';
+
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -205,7 +207,7 @@ const Pomodoro = () => {
                     />
                 </div>
                 <Button variant="contained" onClick={() => setShowSettings(!showSettings)}>{t("pomodoro.confirm-button")}</Button>
-                
+                <Alert className="mx-10 my-10" severity="error"><h7>{t("pomodoro.error-ios")}</h7></Alert>
             </div>
         );
     }

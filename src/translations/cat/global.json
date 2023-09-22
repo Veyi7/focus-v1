@@ -34,7 +34,8 @@
         "adjustments-button" : "Ajustaments",
         "work-minutes" : "Minuts de Treball: ",
         "rest-minutes" : "Minuts de Descans: ",
-        "confirm-button" : "CONFIRMAR"
+        "confirm-button" : "CONFIRMAR",
+        "error-ios" : "En iOS no es poden aprofitar totes les capacitats d'aquesta funció, ja que no hi ha manera d'impedir que la pantalla s'apagui per estalviar energia i, per tant, es perd el temporitzador, disculpeu les molèsties."
     },
 
     "erase-dialog" : {

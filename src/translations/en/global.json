@@ -34,7 +34,8 @@
         "adjustments-button": "ADJUSTMENTS",
         "work-minutes": "Work Minutes: ",
         "rest-minutes": "Rest Minutes: ",
-        "confirm-button": "CONFIRM"
+        "confirm-button": "CONFIRM",
+        "error-ios" : "In iOS, you cannot take advantage of all the capacities of this function, because there is no way to make the screen stays awake, and it loses the timer."
     },
 
     "erase-dialog" : {

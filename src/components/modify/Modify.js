@@ -437,24 +437,24 @@ const Modify = () => {
                       </ListItemButton>
                   </ListItem>
               ))}
-              <ListItem disablePadding sx={{ display: 'block', position: 'fixed', bottom: 20 }}>
-                  <ListItemButton
+              <ListItem className='block fixed' disablePadding>
+                <ListItemButton
                   sx={{
-                      minHeight: 48,
-                      justifyContent: open ? 'initial' : 'center',
-                      px: 2.5,
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
                   }} 
                   onClick={() => signOutButton()}>
-                      <ListItemIcon
-                      sx={{
-                          minWidth: 0,
-                          mr: open ? 3 : 'auto',
-                          justifyContent: 'center',
-                      }}>
-                          <LogoutIcon/>
-                      </ListItemIcon>
-                      <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
-                  </ListItemButton>
+                    <ListItemIcon
+                    sx={{
+                        minWidth: 0,
+                        mr: open ? 3 : 'auto',
+                        justifyContent: 'center',
+                    }}>
+                        <LogoutIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
+                </ListItemButton>
               </ListItem>
             </List>
           </Drawer>
@@ -464,6 +464,7 @@ const Modify = () => {
                     {t("task.modify-title")}
                 </Typography>
             </div>
+            <br/>
             <div className='spacing'>
                 <TextField
                     required
