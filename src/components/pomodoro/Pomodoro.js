@@ -220,11 +220,8 @@ const Pomodoro = () => {
                     {progressBarColor()}
     
                     <Stack sx={{ marginTop: '30px' }} justifyContent="center" direction="row" spacing={2}>
-                        <IconButton onClick={() => {handleStart();  requestScreenWakeLock();}}>
-                            <PlayArrowIcon/>
-                        </IconButton>
-                        <IconButton onClick={() => {handlePause(); releaseScreenWakeLock();}}> 
-                            <PauseIcon/>
+                        <IconButton onClick={() => {handleButtonClick()}}>
+                            {handleButton()}
                         </IconButton>
                     </Stack>
                     <Button sx={{ marginTop: '30px' }} variant="outlined" startIcon={<SettingsIcon />} onClick={() => {setShowSettings(!showSettings); handlePause(); initTimer(); releaseScreenWakeLock();}}>{t("pomodoro.adjustments-button")}</Button>
@@ -234,6 +231,26 @@ const Pomodoro = () => {
         );
     }
 
+    const handleButton = () => {
+        if (isPaused) {
+            return (<PlayArrowIcon/>);
+        }
+        else {
+            return (<PauseIcon/>);
+        }
+    }
+
+    function handleButtonClick() {
+        if (isPaused) {
+            handleStart();  
+            requestScreenWakeLock();
+        }
+        else {
+            handlePause(); 
+            releaseScreenWakeLock();
+        }
+    }
+    
     function handleStart() {
         setIsPaused(false);
         isPausedRef.current = false;
