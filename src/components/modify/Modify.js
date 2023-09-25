@@ -148,23 +148,56 @@ const Modify = () => {
       setTitle(title.toString());
   };
 
-  const addMiniTask = () => {
+  const addMiniTask = async () => {
       if (miniTasks) {
           if (miniTasks.length > 0) {
-              const aux = miniTasks;
-              aux.push(actualMiniTask);
-              setMiniTasks(aux);
+              await api.post("/task/new/minitask", {
+                  id: task.id,
+                  title: actualMiniTask,
+              }, {
+                  headers: {
+                      'Content-Type': 'multipart/form-data'
+                  }
+              }).then(async (response) => {
+                  if (response) {
+                    const aux = miniTasks;
+                    aux.push(actualMiniTask);
+                    setMiniTasks(aux);
+                  } 
+              });
           }
           else {
-              const aux = [];
-              aux.push(actualMiniTask);
-              setMiniTasks(aux);
+            await api.post("/task/new/minitask", {
+                id: task.id,
+                title: actualMiniTask,
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(async (response) => {
+                if (response) {
+                  const aux = [];
+                  aux.push(actualMiniTask);
+                  setMiniTasks(aux);
+                } 
+            });
           }
       }
       else {
-          const aux = [];
-          aux.push(actualMiniTask);
-          setMiniTasks(aux);
+        await api.post("/task/new/minitask", {
+            id: task.id,
+            title: actualMiniTask,
+        }, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(async (response) => {
+            if (response) {
+              const aux = [];
+              aux.push(actualMiniTask);
+              setMiniTasks(aux);
+            } 
+        });
       }
       setActualMiniTask("");
   };

@@ -251,10 +251,11 @@ const Home = () => {
                 return (
                     <Box>
                         <LinearProgress variant="determinate" value={progressCalc(task)} />
+                        <br/>
                         <List
                             subheader = {
                                 <ListSubheader component="div" id="nested-list-subheader">
-                                    <Typography variant="h6" color="text.secondary">
+                                    <Typography variant="subtitle1" color="text.secondary">
                                         {t("task.miniTask-list")}
                                     </Typography>
                                 </ListSubheader>
@@ -373,12 +374,11 @@ const Home = () => {
                         subheader={actualTask.startDateTime}
                     />
                     <CardContent>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="subtitle1" color="text.secondary">
                             {actualTask.description}
                         </Typography>
-
+                        <br/>
                         {miniTasks(actualTask)} 
-                                    
                         <Typography variant="body2" color="text.secondary">
                             {t("task.creation-date")} {actualTask.creationDateTime}
                         </Typography>
@@ -538,7 +538,7 @@ const Home = () => {
                             </ListItem>
                         </List>
                     </Drawer>
-                    <Box sx={{ marginLeft: '20px', marginTop: '90px', width: '94%', bgcolor: 'background.paper' }}>
+                    <Box sx={{ marginLeft: '10px', marginTop: '70px', width: '93%', bgcolor: 'background.paper' }}>
                         {handleTasks(tasks)}
                         <div className="floating-buttons">
                             <Tooltip title={t("tooltips.create-button")} arrow>

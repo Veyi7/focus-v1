@@ -356,40 +356,21 @@ const Calendar = () => {
                             subheader={actualTask.startDateTime}
                         />
                         <CardContent>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="subtitle1" color="text.secondary">
                                 {actualTask.description}
                             </Typography>
-
+                            <br/>
                             {miniTasks(actualTask)} 
-                            
+                            <br/>
+                            <Typography variant="subtitle2" color="text.secondary">
+                                {t("task.creation-date")} {actualTask.creationDateTime}
+                            </Typography>
                         </CardContent>
-                        <CardActions disableSpacing>        
-                            <ExpandMore
-                                expand={expanded}
-                                onClick={handleExpandClick}
-                                aria-expanded={expanded}
-                                aria-label="show more"
-                            >
-                                <ExpandMoreIcon />
-                            </ExpandMore>
-                        </CardActions>
-                        <Collapse in={expanded} timeout="auto" unmountOnExit>
-                            <CardContent>                               
-                                <Typography variant="body2" color="text.secondary">
-                                    {t("task.creation-date")} {actualTask.creationDateTime}
-                                </Typography>
-                            </CardContent>
-                        </Collapse>
                     </Card>
                 </Container>
             </Box>
         );
     }
-
-    //Expands the card
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    };
 
     //Creates the list of Tasks for each day that has them
     const retListItems = (task) => {
@@ -462,10 +443,11 @@ const Calendar = () => {
                 return (
                     <Box>
                         <LinearProgress variant="determinate" value={progressCalc(task)} />
+                        <br/>
                         <List
                             subheader = {
                                 <ListSubheader component="div" id="nested-list-subheader">
-                                    <Typography variant="h6" color="text.secondary">
+                                    <Typography variant="subtitle1" color="text.secondary">
                                         {t("task.miniTask-list")}
                                     </Typography>
                                 </ListSubheader>
@@ -506,10 +488,16 @@ const Calendar = () => {
     //Handles if the task is shown or not 
     function handleTask() {
         var box = document.getElementById("myBox");
+        var box2 = document.getElementById("myBox1");
         if (box.style.display === "none") {
             box.style.display = "block";
         } else {
             box.style.display = "none";
+        }
+        if (box2.style.display === "none") {
+            box2.style.display = "block";
+        } else {
+            box2.style.display = "none";
         }
     }
 
@@ -517,11 +505,15 @@ const Calendar = () => {
     function showTask() {
         var box = document.getElementById("myBox");
         box.style.display = "block";
+        box = document.getElementById("myBox1");
+        box.style.display = "block";
     }
 
     //Hids task
     function closeTask() {
         var box = document.getElementById("myBox");
+        box.style.display = "none";
+        box = document.getElementById("myBox1");
         box.style.display = "none";
     }
 
@@ -614,8 +606,8 @@ const Calendar = () => {
 
     else {
         return (
-            <div className="Row">
-                <div className="Column">
+            <div>
+                <div>
                     <Box sx={{ display: 'flex' }}>
                         <CssBaseline />
                         <AppBar position="fixed" open={open}>
@@ -708,10 +700,15 @@ const Calendar = () => {
                                 {TaskDay(tasks, calendarDate)}
                             </List>
                         </Box>
+                        <div className='hidden md:block mx-auto'>
+                            <div id="myBox" className ="hidden-box">
+                                {loadTask()}
+                            </div>
+                        </div>
                     </Box>
                 </div>
-                <div className="Column">
-                    <div id="myBox" className ="hidden-box">
+                <div className='sm:block md:hidden lg:hidden xl:hidden'>
+                    <div id="myBox1" className ="hidden-box-mobile">
                         {loadTask()}
                     </div>
                 </div>
