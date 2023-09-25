@@ -198,8 +198,7 @@ const Home = () => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            miniTask.done = false;
-            window.location.reload();
+            await getListTasks();
         }
         else if (miniTask.done === false) {
             const idmt = miniTask.id;
@@ -213,8 +212,7 @@ const Home = () => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            miniTask.done = true;
-            window.location.reload();
+            await getListTasks();
         }
     };
 
@@ -278,12 +276,13 @@ const Home = () => {
 
     const deleteForever = async (id) => {
         const response = await api.delete("/task/delete?id="+id);
-        window.location.reload();
+        await getListTasks();
     };
 
     const changeBoolean = async (task) => {
         if (task.done === false) {
-            const response = await api.post("/task/update", {
+            
+            await api.post("/task/update", {
                 id: task.id,
                 title: task.title,
                 description: task.description,
@@ -293,11 +292,15 @@ const Home = () => {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
+            }).then(async (response) => {
+                if (response) {
+                    await getListTasks();
+                }
+                
             });
-            window.location.reload();
         }
         else {
-            const response = await api.post("/task/update", {
+            await api.post("/task/update", {
                 id: task.id,
                 title: task.title,
                 description: task.description,
@@ -307,8 +310,13 @@ const Home = () => {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
+            }).then(async (response) => {
+                if (response) {
+                    await getListTasks();
+                }
+                
             });
-            window.location.reload();
+            
         }
     };
 

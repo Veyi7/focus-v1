@@ -222,7 +222,8 @@ const Calendar = () => {
 
     const changeBoolean = async (task) => {
         if (task.done === false) {
-            const response = await api.post("/task/update", {
+            
+            await api.post("/task/update", {
                 id: task.id,
                 title: task.title,
                 description: task.description,
@@ -232,11 +233,15 @@ const Calendar = () => {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
+            }).then(async (response) => {
+                if (response) {
+                    await getListTasks();
+                }
+                
             });
-            window.location.reload();
         }
         else {
-            const response = await api.post("/task/update", {
+            await api.post("/task/update", {
                 id: task.id,
                 title: task.title,
                 description: task.description,
@@ -246,8 +251,13 @@ const Calendar = () => {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
+            }).then(async (response) => {
+                if (response) {
+                    await getListTasks();
+                }
+                
             });
-            window.location.reload();
+            
         }
     };
 
@@ -266,8 +276,8 @@ const Calendar = () => {
 
         if (user) {
             if (user != "") {
-                await getTasks(user);
-                
+                const aux = await getTasks(user);
+                return aux;
             } 
         }
     };
@@ -278,6 +288,7 @@ const Calendar = () => {
             setTasks(response.data);
             const aux = response.data.map(task => dayjs(task.startDateTime));
             setHighlightedDays(aux);
+            return response.data;
         } 
         catch(err){
             console.log(err);
@@ -287,11 +298,14 @@ const Calendar = () => {
     const handleErase = async () => {
         const apiUrl = 'https://focustfg-2-production.up.railway.app/task/delete';
         const aux = actualTask.id;
-        api.delete(`${apiUrl}?id=${aux}`);
-        
-        setActualTask([]);
-        handleClose();
-        window.location.reload();
+        await api.delete(`${apiUrl}?id=${aux}`).then(async (response) => {
+            if (response) {
+                await getListTasks();
+                setActualTask([]);
+                closeTask();
+                handleClose();
+            }
+        });
     }
 
     //Creation of the task cards
@@ -399,41 +413,23 @@ const Calendar = () => {
 
     //Handles what happens when you click on a miniTask
     const handleListMiniTaskClick = async (event, miniTask) => {
-        //const boolvalue = false;
-        if (miniTask.done === true) {
-            const idmt = miniTask.id;
-            const titlemt = miniTask.title;
-            const response = await api.post("/task/update/minitask", {
-                id: idmt,
-                title: titlemt,
-                done: false
-            }, {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
-                }
-            });
-            const indice = actualTask.miniTasks.findIndex((mt) => mt.id === idmt);
-            const aux = actualTask;
-            aux.miniTasks[indice].done = false;
-            setActualTask(aux);
-        }
-        else if (miniTask.done === false) {
-            const idmt = miniTask.id;
-            const titlemt = miniTask.title;
-            const response = await api.post("/task/update/minitask", {
-                id: idmt,
-                title: titlemt,
-                done: true
-            }, {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
-                }
-            });
-            const indice = actualTask.miniTasks.findIndex((mt) => mt.id === idmt);
-            const aux = actualTask;
-            aux.miniTasks[indice].done = true;
-            setActualTask(aux);
-        }
+        const idmt = miniTask.id;
+        const titlemt = miniTask.title;
+        await api.post("/task/update/minitask", {
+            id: idmt,
+            title: titlemt,
+            done: !miniTask.done
+        }, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(async (response) => {
+            if (response) {
+                const aux1 = await getListTasks();
+                const aux = aux1.find((task) => task.id === miniTask.taskId);
+                setActualTask(aux);
+            }
+        });
     };
 
     //Creates the list of miniTasks for each task that has them
