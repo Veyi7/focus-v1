@@ -221,44 +221,23 @@ const Calendar = () => {
     }
 
     const changeBoolean = async (task) => {
-        if (task.done === false) {
-            
-            await api.post("/task/update", {
-                id: task.id,
-                title: task.title,
-                description: task.description,
-                date: task.startDateTime,
-                done: true
-            }, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(async (response) => {
-                if (response) {
-                    await getListTasks();
-                }
-                
-            });
-        }
-        else {
-            await api.post("/task/update", {
-                id: task.id,
-                title: task.title,
-                description: task.description,
-                date: task.startDateTime,
-                done: false
-            }, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(async (response) => {
-                if (response) {
-                    await getListTasks();
-                }
-                
-            });
-            
-        }
+        await api.post("/task/update", {
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            date: task.startDateTime,
+            done: !task.done
+        }, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(async (response) => {
+            if (response) {
+                const aux1 = await getListTasks();
+                const aux = aux1.find((task) => task.id === actualTask.id);
+                setActualTask(aux);
+            }
+        });
     };
 
     const handleChange = (lng) => {

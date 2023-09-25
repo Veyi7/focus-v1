@@ -149,10 +149,11 @@ const Modify = () => {
   };
 
   const addMiniTask = async () => {
+    if (actualMiniTask != "") {
       if (miniTasks) {
           if (miniTasks.length > 0) {
               await api.post("/task/new/minitask", {
-                  id: task.id,
+                  id: id,
                   title: actualMiniTask,
               }, {
                   headers: {
@@ -168,7 +169,7 @@ const Modify = () => {
           }
           else {
             await api.post("/task/new/minitask", {
-                id: task.id,
+                id: id,
                 title: actualMiniTask,
             }, {
                 headers: {
@@ -185,13 +186,13 @@ const Modify = () => {
       }
       else {
         await api.post("/task/new/minitask", {
-            id: task.id,
+            id: id,
             title: actualMiniTask,
         }, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
-        }).then(async (response) => {
+        }).then((response) => {
             if (response) {
               const aux = [];
               aux.push(actualMiniTask);
@@ -200,6 +201,7 @@ const Modify = () => {
         });
       }
       setActualMiniTask("");
+    }
   };
 
   const miniTaskList = (miniTasks) => {
@@ -216,209 +218,86 @@ const Modify = () => {
       );
   };
     
-    const handleDrawerOpen = () => {
-        setOpen(!open);
-    };
+  const handleDrawerOpen = () => {
+      setOpen(!open);
+  };
 
-    const handleIcon = (index) => {
-        if (index === 0) {
-            return <InboxIcon/>;
-        }
-        else if (index === 1) {
-            return <CalendarMonthIcon/>;
-        }
-        else if (index === 2) {
-            return <ScheduleIcon/>;
-        }
-        else if (index === 3) {
-            return <BuildIcon/>;
+  const handleIcon = (index) => {
+      if (index === 0) {
+          return <InboxIcon/>;
+      }
+      else if (index === 1) {
+          return <CalendarMonthIcon/>;
+      }
+      else if (index === 2) {
+          return <ScheduleIcon/>;
+      }
+      else if (index === 3) {
+          return <BuildIcon/>;
+      }
+  }
+
+  const linkage = (index) => {
+      if (index === 0) {
+          return "/home";
+      }
+      else if (index === 1) {
+          return "/calendar";
+      }
+      else if (index === 2) {
+        return "/pomodoro";
+      }
+      
+  }
+
+  const signOutButton = () => {
+    const auth = getAuth();
+    signOut(auth).then(() => {
+        console.log("Sign-out Succesful"); 
+        navigate('/');
+    }).catch((error)=> {
+        console.log(error);
+    })
+  }
+
+  const setValues = (aux) => {
+    setTitle(aux.title);
+    if (aux.description) {
+      setDescription(aux.description);
+    }
+    setValue(dayjs(aux.startDateTime));
+    if (aux.miniTasks.length > 0) {
+      setMiniTasks(aux.miniTasks);
+    }
+    setDone(aux.done);
+  }
+
+  const modifyTask = async () => {
+    if (title != null && title != "") {
+        if (value != null) {
+          await api
+          .post("/task/update?id="+id+"&title="+title+"&description="+description+"&date="+value.toString()+"&done="+done)
+          .then((response) => {
+            if (response.data.id != 0) {
+              navigate('/home');
+            }
+          });           
         }
     }
+  };
 
-    const linkage = (index) => {
-        if (index === 0) {
-            return "/home";
-        }
-        else if (index === 1) {
-            return "/calendar";
-        }
-        else if (index === 2) {
-          return "/pomodoro";
-        }
-        
+  const getListTasks = async() => {
+    const user = localStorage.getItem("userInfo");
+
+    if (user) {
+        if (user != "") {
+            await getTasks(user);
+        } 
     }
+  };
 
-    const signOutButton = () => {
-      const auth = getAuth();
-      signOut(auth).then(() => {
-          console.log("Sign-out Succesful"); 
-          navigate('/');
-      }).catch((error)=> {
-          console.log(error);
-      })
-    }
-
-    const setMt = (mt) => {
-      if (miniTasks) {
-          if (miniTasks.length > 0) {
-              console.log("pushea a array con elementos");
-              const aux = miniTasks;
-              aux.push(mt);
-              setMiniTasks(aux);
-          }
-          else {
-              console.log("Pushea a Array Vacío");
-              const aux = [];
-              aux.push(mt);
-              setMiniTasks(aux);
-          }
-      }
-      else {
-          const aux = [];
-          aux.push(mt);
-          setMiniTasks(aux);
-      }
-    };
-
-    const setValues = (aux) => {
-      setTitle(aux.title);
-      if (aux.description) {
-        setDescription(aux.description);
-      }
-      setValue(dayjs(aux.startDateTime));
-      if (aux.miniTasks.length > 0) {
-        aux.miniTasks.map((mt) => setMt(mt));
-      }
-      setDone(aux.done);
-    }
-
-    const modifyTask = async () => {
-      if (title != null && title != "") {
-        console.log("pasa1");
-          if (value != null) {
-            console.log("pasa2");
-            const response = await api.post("/task/update?id="+id+"&title="+title+"&description="+description+"&date="+value.toString()+"&done="+done);
-            
-            navigate('/home');
-          }
-      }
-    };
-
-    const getListTasks = async() => {
-      const user = localStorage.getItem("userInfo");
-
-      if (user) {
-          if (user != "") {
-              await getTasks(user);
-              
-          } 
-      }
-    };
-
-    const errorModify = () => {
-      if (empty) {
-        return (
-          <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
-            <AppBar position="fixed" open={open}>
-                <Toolbar>
-                <IconButton
-                    color="inherit"
-                    aria-label="open drawer"
-                    onClick={handleDrawerOpen}
-                    edge="start"
-                    sx={{
-                    marginRight: 5,
-                    ...(open && { display: 'none' }),
-                    }}
-                >
-                    <MenuIcon />
-                </IconButton>
-                <Typography variant="h6" noWrap component="div">
-                    {t("header.modify")}
-                </Typography>
-                </Toolbar>
-            </AppBar>
-            <Drawer variant="permanent" open={open}>
-              <DrawerHeader>
-              <IconButton onClick={handleDrawerOpen}>
-                  {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-              </IconButton>
-              </DrawerHeader>
-              <Divider />
-              <List>
-                {[ t("header.home") , t("header.calendar"), t("header.pomodoros")].map((text, index) => (
-                    <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                        <ListItemButton
-                            sx={{
-                            minHeight: 48,
-                            justifyContent: open ? 'initial' : 'center',
-                            px: 2.5,
-                            }} 
-                            component={Link} to={linkage(index)}
-                        >
-                            <ListItemIcon
-                            sx={{
-                                minWidth: 0,
-                                mr: open ? 3 : 'auto',
-                                justifyContent: 'center',
-                            }}
-                            >
-                                {handleIcon(index)}
-                            </ListItemIcon>
-                            <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-                <ListItem className='block fixed' disablePadding>
-                  <ListItemButton
-                    sx={{
-                      minHeight: 48,
-                      justifyContent: open ? 'initial' : 'center',
-                      px: 2.5,
-                    }} 
-                    onClick={() => signOutButton()}>
-                      <ListItemIcon
-                      sx={{
-                          minWidth: 0,
-                          mr: open ? 3 : 'auto',
-                          justifyContent: 'center',
-                      }}>
-                          <LogoutIcon/>
-                      </ListItemIcon>
-                      <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            </Drawer>
-            <Alert className="mx-10 my-24" severity="error">Don't try to access other people's data!</Alert>
-          </Box>
-        );
-      }
-      else {
-        return modificationBody();
-      }
-    };
-
-    const getTasks = async (uid) => {
-      try {
-        const response = await api.get('/task/user?user_id='+uid);
-        setTasks(response.data);
-        const idInt = parseInt(id);
-        const aux = response.data.filter(task => task.id === idInt);
-        if (aux.length === 0) {
-          setEmpty(true);
-        }
-        else {
-          aux.map((task) => setValues(task));
-        }
-      } 
-      catch(err){
-          console.log(err);
-      }
-    };
-
-    const modificationBody = () => {
+  const errorModify = () => {
+    if (empty) {
       return (
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
@@ -448,7 +327,7 @@ const Modify = () => {
             </IconButton>
             </DrawerHeader>
             <Divider />
-            <List className='justify-center'>
+            <List>
               {[ t("header.home") , t("header.calendar"), t("header.pomodoros")].map((text, index) => (
                   <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                       <ListItemButton
@@ -493,80 +372,181 @@ const Modify = () => {
               </ListItem>
             </List>
           </Drawer>
-          <Box sx={{ marginLeft: '20px', marginTop: '90px'}}>
-            <div>
-                <Typography variant="h4">
-                    {t("task.modify-title")}
-                </Typography>
-            </div>
-            <br/>
-            <div className='spacing'>
-                <TextField
-                    required
-                    id="task-title"
-                    label={t("task.title")}
-                    value={title}
-                    onChange={(event) => handleTitle(event.target.value)}
-                />
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DateTimePicker
-                        label="Date and Time Picker"
-                        value={value}
-                        onChange={(newValue) => setValue(newValue)}
-                    />
-                </LocalizationProvider>
-            </div>
-            <div>
-                <TextField
-                    id="task-description"
-                    label={t("task.description")}
-                    fullWidth 
-                    value={description}
-                    onChange={(event) => handleDescription(event.target.value)}
-                    margin="normal"
-                />
-            </div>
-            <div className='spacing'>
-                <TextField
-                    id="miniTask-title"
-                    label={t("task.miniTask")}
-                    value={actualMiniTask}
-                    fullWidth
-                    onChange={(event) => setActualMiniTask(event.target.value)}
-                    margin="normal"
-                />
-                <Button variant="contained" onClick={addMiniTask}>{t("task.add-miniTask")}</Button>
-            </div>
-            <div className='spacing'>
-              <List>
-                  {miniTaskList(miniTasks)}
-              </List>
-            </div>
-            <div>
-                <Button variant="contained" onClick={modifyTask}>{t("task.modify")}</Button>
-                <Button component={Link} to={"/home"}>{t("task.cancel")}</Button>
-            </div>
-          </Box>
+          <Alert className="mx-10 my-24" severity="error">Don't try to access other people's data!</Alert>
         </Box>
       );
     }
+    else {
+      return modificationBody();
+    }
+  };
 
-    useEffect(() => {
-      if (tasks.length === 0) {
-        getListTasks();
+  const getTasks = async (uid) => {
+    try {
+      const response = await api.get('/task/user?user_id='+uid);
+      setTasks(response.data);
+      const idInt = parseInt(id);
+      if (response.data.length === 0) {
+        setEmpty(true);
       }
-      const lng = localStorage.getItem("lng");
-        if (language != lng) {
-            handleChange(lng);
+      else {
+        const aux = response.data.find(task => task.id === idInt);
+        setValues(aux);
       }
-    },[]);
+    } 
+    catch(err){
+        console.log(err);
+    }
+  };
 
+  const modificationBody = () => {
     return (
-        <div>
-          {errorModify()}
-          
-        </div>
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBar position="fixed" open={open}>
+            <Toolbar>
+            <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{
+                marginRight: 5,
+                ...(open && { display: 'none' }),
+                }}
+            >
+                <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">
+                {t("header.modify")}
+            </Typography>
+            </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <DrawerHeader>
+          <IconButton onClick={handleDrawerOpen}>
+              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List className='justify-center'>
+            {[ t("header.home") , t("header.calendar"), t("header.pomodoros")].map((text, index) => (
+                <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                    <ListItemButton
+                        sx={{
+                        minHeight: 48,
+                        justifyContent: open ? 'initial' : 'center',
+                        px: 2.5,
+                        }} 
+                        component={Link} to={linkage(index)}
+                    >
+                        <ListItemIcon
+                        sx={{
+                            minWidth: 0,
+                            mr: open ? 3 : 'auto',
+                            justifyContent: 'center',
+                        }}
+                        >
+                            {handleIcon(index)}
+                        </ListItemIcon>
+                        <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                    </ListItemButton>
+                </ListItem>
+            ))}
+            <ListItem className='block fixed' disablePadding>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }} 
+                onClick={() => signOutButton()}>
+                  <ListItemIcon
+                  sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                  }}>
+                      <LogoutIcon/>
+                  </ListItemIcon>
+                  <ListItemText primary={t("header.sign-out")} sx={{ opacity: open ? 1 : 0 }} />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Drawer>
+        <Box sx={{ marginLeft: '20px', marginTop: '90px'}}>
+          <div>
+              <Typography variant="h4">
+                  {t("task.modify-title")}
+              </Typography>
+          </div>
+          <br/>
+          <div className='spacing'>
+              <TextField
+                  required
+                  id="task-title"
+                  label={t("task.title")}
+                  value={title}
+                  onChange={(event) => handleTitle(event.target.value)}
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                      label="Date and Time Picker"
+                      value={value}
+                      onChange={(newValue) => setValue(newValue)}
+                  />
+              </LocalizationProvider>
+          </div>
+          <div>
+              <TextField
+                  id="task-description"
+                  label={t("task.description")}
+                  fullWidth 
+                  value={description}
+                  onChange={(event) => handleDescription(event.target.value)}
+                  margin="normal"
+              />
+          </div>
+          <div className='spacing'>
+              <TextField
+                  id="miniTask-title"
+                  label={t("task.miniTask")}
+                  value={actualMiniTask}
+                  fullWidth
+                  onChange={(event) => setActualMiniTask(event.target.value)}
+                  margin="normal"
+              />
+              <Button variant="contained" onClick={addMiniTask}>{t("task.add-miniTask")}</Button>
+          </div>
+          <div className='spacing'>
+            <List>
+                {miniTaskList(miniTasks)}
+            </List>
+          </div>
+          <div>
+              <Button variant="contained" onClick={modifyTask}>{t("task.modify")}</Button>
+              <Button component={Link} to={"/home"}>{t("task.cancel")}</Button>
+          </div>
+        </Box>
+      </Box>
     );
+  }
+
+  useEffect(() => {
+    if (tasks.length === 0) {
+      getListTasks();
+    }
+    const lng = localStorage.getItem("lng");
+    if (language != lng) {
+      handleChange(lng);
+    }
+  },[]);
+
+  return (
+    <div>
+      {errorModify()}
+    </div>
+  );
 }
 
 export default Modify;

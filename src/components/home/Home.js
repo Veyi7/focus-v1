@@ -538,7 +538,7 @@ const Home = () => {
                             </ListItem>
                         </List>
                     </Drawer>
-                    <Box sx={{ marginLeft: '10px', marginTop: '70px', width: '93%', bgcolor: 'background.paper' }}>
+                    <Box sx={{ marginLeft: '10px', marginTop: '80px', width: '93%', bgcolor: 'background.paper' }}>
                         {handleTasks(tasks)}
                         <div className="floating-buttons">
                             <Tooltip title={t("tooltips.create-button")} arrow>
