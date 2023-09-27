@@ -224,7 +224,7 @@ const Pomodoro = () => {
                             {handleButton()}
                         </IconButton>
                     </Stack>
-                    <Button sx={{ marginTop: '30px' }} variant="outlined" startIcon={<SettingsIcon />} onClick={() => {setShowSettings(!showSettings); handlePause(); initTimer(); releaseScreenWakeLock();}}>{t("pomodoro.adjustments-button")}</Button>
+                    <Button id="adjustments" sx={{ marginTop: '30px' }} variant="outlined" startIcon={<SettingsIcon />} onClick={() => {setShowSettings(!showSettings); handlePause(); initTimer(); releaseScreenWakeLock();}}>{t("pomodoro.adjustments-button")}</Button>
                 </Box>
             </div>
             
@@ -244,10 +244,14 @@ const Pomodoro = () => {
         if (isPaused) {
             handleStart();  
             requestScreenWakeLock();
+            var boton = document.getElementById("adjustments");
+            boton.disabled = true;
         }
         else {
             handlePause(); 
             releaseScreenWakeLock();
+            var boton = document.getElementById("adjustments");
+            boton.disabled = false;
         }
     }
     

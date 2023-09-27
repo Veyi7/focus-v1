@@ -37,6 +37,12 @@ import api from '../../api/axiosConfig.js';
 import EditIcon from '@mui/icons-material/Edit';
 import dayjs from 'dayjs';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 //Grid Imports
 import Grid from '@mui/material/Unstable_Grid2';
 //Floating Icon Imports
@@ -123,6 +129,7 @@ const Home = () => {
     const [actual, setActual] = React.useState(false);
     const [tasks, setTasks] = React.useState([]);
     const [refresh, setRefresh] = React.useState(true);
+    const [openMessage, setMessageOpen] = React.useState(false);
 
     const { t, i18n } = useTranslation('global');
 
@@ -276,8 +283,12 @@ const Home = () => {
     };
 
     const deleteForever = async (id) => {
-        const response = await api.delete("/task/delete?id="+id);
-        await getListTasks();
+        await api.delete("/task/delete?id="+id).then(async (response) => {
+            if (response.data.id != 0) {
+                await getListTasks();
+                handleClose();
+            }
+        });
     };
 
     const changeBoolean = async (task) => {
@@ -348,6 +359,10 @@ const Home = () => {
         }
     }
 
+    function handleClose() {
+        setMessageOpen(!openMessage);
+    }
+
     const loadTask = (actualTask) => {
         return (
             <Grid xs={4} sm={4} md={6} key = {actualTask.id + '+'}>
@@ -364,10 +379,32 @@ const Home = () => {
                                 </IconButton>
 
                                 <IconButton aria-label="erase"
-                                    onClick={() => {deleteForever(actualTask.id)}}
+                                    onClick={() => {handleClose()}}
                                 >
                                     <DeleteForeverIcon/>
                                 </IconButton>
+
+                                <Dialog
+                                    open={openMessage}
+                                    onClose={() => handleClose()}
+                                    aria-labelledby="alert-dialog-title"
+                                    aria-describedby="alert-dialog-description"
+                                >
+                                    <DialogTitle id="alert-dialog-title">
+                                        {t("erase-dialog.title")}
+                                    </DialogTitle>
+                                    <DialogContent>
+                                        <DialogContentText id="alert-dialog-description">
+                                            {t("erase-dialog.subtitle")}
+                                        </DialogContentText>
+                                    </DialogContent>
+                                    <DialogActions>
+                                    <Button onClick={() => handleClose()}>{t("erase-dialog.disagree-button")}</Button>
+                                    <Button onClick={() => deleteForever(actualTask.id)} autoFocus>
+                                        {t("erase-dialog.agree-button")}
+                                    </Button>
+                                    </DialogActions>
+                                </Dialog>
                             </div>
                         }
                         title={actualTask.title}
