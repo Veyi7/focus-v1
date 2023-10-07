@@ -183,6 +183,7 @@ const Create = () => {
                     }
                 });
                 const id = response.data.id;
+                insertInCalendar(id);
                 if (miniTasks) {
                     if (miniTasks.length > 0) {
                         miniTasks.map((mt) => createMT(mt, id));
@@ -192,6 +193,40 @@ const Create = () => {
             }
         }
     };
+
+    function insertInCalendar(id) {
+        const { google } = require('googleapis');
+        const oauth2Client = new google.auth.OAuth2();
+        oauth2Client.setCredentials({
+            access_token: localStorage.getItem("calendar"),
+        });
+        const calendar = google.calendar({ version: 'v3', auth: oauth2Client});
+        const fecha = value.add(1, 'hour');
+        const eventDetails = {
+            summary: title,
+            description: 'ID:' + id + '; ' + description,
+            start: {
+                dateTime: value.toISOString(),
+                timeZone: 'Europe/Madrid',
+            },
+            end: {
+                dateTime: fecha.toISOString(),
+                timeZone: 'Europe/Madrid',
+            },
+        };
+        calendar.events.insert(
+            {
+                calendarId: 'primary',
+                resource: eventDetails,
+            }, 
+            (err, event) => {
+                if (err) {
+                    console.error('Error creando el evento:', err);
+                }
+                console.log('Evento creado:', event.data);
+            }
+        );
+    }; 
 
     const handleDescription = (description) => {
         setDescription(description.toString());

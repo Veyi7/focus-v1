@@ -25,6 +25,7 @@ const Login = () => {
 
     const signInWithPopUp = async () => {
         const provider = new GoogleAuthProvider();
+        provider.addScope("https://www.googleapis.com/auth/calendar")
         const auth = getAuth();
         await signInWithPopup(auth, provider)
         .then((result) => {
@@ -34,6 +35,7 @@ const Login = () => {
             const user = result.user;
             localStorage.setItem("userInfo", user.uid);
             localStorage.setItem("lng", language);
+            localStorage.setItem("calendar", token);
             navigate('/home');
         }).catch((error) => {
             console.log('Error al iniciar sesión con Google', error);
