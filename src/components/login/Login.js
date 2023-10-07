@@ -10,6 +10,9 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
+import { google } from 'googleapis';
+
+
 const Login = () => {
     const { t, i18n } = useTranslation('global');
 
@@ -25,6 +28,7 @@ const Login = () => {
 
     const signInWithPopUp = async () => {
         const provider = new GoogleAuthProvider();
+        provider.addScope("https://www.googleapis.com/auth/calendar");
         const auth = getAuth();
         await signInWithPopup(auth, provider)
         .then((result) => {
@@ -32,8 +36,10 @@ const Login = () => {
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const token = credential.accessToken;
             const user = result.user;
+            console.log(token);
             localStorage.setItem("userInfo", user.uid);
             localStorage.setItem("lng", language);
+            //localStorage.setItem("calendar", token);
             navigate('/home');
         }).catch((error) => {
             console.log('Error al iniciar sesión con Google', error);
