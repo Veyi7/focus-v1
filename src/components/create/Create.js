@@ -235,7 +235,6 @@ const Create = () => {
             return data.json();
         }).then((data) => {
             console.log(data);
-            alert("Event created, check your Google Calendar!");
         });
     };  
 

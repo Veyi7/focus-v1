@@ -265,7 +265,8 @@ const Modify = () => {
     if (aux.description) {
       setDescription(aux.description);
     }
-    setValue(dayjs(aux.startDateTime));
+    const aux2 = dayjs(aux.startDateTime);
+    setValue(aux2.add(2, 'hour'));
     if (aux.miniTasks.length > 0) {
       setMiniTasks(aux.miniTasks);
     }
@@ -279,12 +280,49 @@ const Modify = () => {
           .post("/task/update?id="+id+"&title="+title+"&description="+description+"&date="+value.toString()+"&done="+done)
           .then((response) => {
             if (response.data.id != 0) {
+              modifyInCalendar(id);
               navigate('/home');
             }
           });           
         }
     }
   };
+
+  const modifyInCalendar = async (id) => {
+
+    const fecha = value.add(1, 'hour');
+
+    const eventDetails = {
+        summary: title,
+        description: description,
+        start: {
+            dateTime: value.toISOString(),
+            timeZone: 'Europe/Madrid',
+        },
+        end: {
+            dateTime: fecha.toISOString(),
+            timeZone: 'Europe/Madrid',
+        },
+        reminders: {
+            useDefault: false,
+            overrides: [
+              { method: 'email', minutes: 60 },
+            ],
+        },
+    };
+
+    await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events/focus"+id, {
+        method: "PUT",
+        headers: {
+            'Authorization':'Bearer ' + localStorage.getItem("calendar") // Access token for google
+        },
+        body: JSON.stringify(eventDetails)
+    }).then((data) => {
+        return data.json();
+    }).then((data) => {
+        console.log(data);
+    });
+};
 
   const getListTasks = async() => {
     const user = localStorage.getItem("userInfo");
