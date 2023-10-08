@@ -129,7 +129,7 @@ const Home = () => {
     const [actual, setActual] = React.useState(false);
     const [tasks, setTasks] = React.useState([]);
     const [refresh, setRefresh] = React.useState(true);
-    const [openMessage, setMessageOpen] = React.useState(false);
+    const [openMessage, setMessageOpen] = React.useState([]);
 
     const { t, i18n } = useTranslation('global');
 
@@ -283,13 +283,25 @@ const Home = () => {
     };
 
     const deleteForever = async (id) => {
-        await api.delete("/task/delete?id="+id).then(async (response) => {
+        
+        await api.delete("/task/delete?id="+id)
+        .then(async (response) => {
             if (response.data.id != 0) {
+                deleteGoogle(id);
                 await getListTasks();
                 handleClose();
             }
         });
     };
+
+    const deleteGoogle = async (id) => {
+        await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events/focus"+id, {
+            method: "DELETE",
+            headers: {
+                'Authorization':'Bearer ' + localStorage.getItem("calendar")
+            }
+        });
+    }
 
     const changeBoolean = async (task) => {
         if (task.done === false) {
@@ -359,14 +371,18 @@ const Home = () => {
         }
     }
 
-    function handleClose() {
-        setMessageOpen(!openMessage);
+    function handleClose(id) {
+        const aux = [...openMessage];
+        const index = aux.findIndex((elem) => elem.id === id);
+        aux[index].isOpen = !(aux[index].isOpen);
+        setMessageOpen(aux);
     }
 
     const loadTask = (actualTask) => {
+        const opened = openMessage.find((elem) => elem.id === actualTask.id).isOpen;
         return (
             <Grid xs={4} sm={4} md={6} key = {actualTask.id + '+'}>
-                <Card key = {actualTask.id}>
+                <Card key = {actualTask.id + '-'}>
                     <CardHeader
                         action={
                             <div>
@@ -379,14 +395,17 @@ const Home = () => {
                                 </IconButton>
 
                                 <IconButton aria-label="erase"
-                                    onClick={() => {handleClose()}}
+                                    id={actualTask.id}
+                                    onClick={() => {
+                                        handleClose(actualTask.id);
+                                    }}
                                 >
                                     <DeleteForeverIcon/>
                                 </IconButton>
 
                                 <Dialog
-                                    open={openMessage}
-                                    onClose={() => handleClose()}
+                                    open={opened}
+                                    onClose={() => handleClose(actualTask.id)}
                                     aria-labelledby="alert-dialog-title"
                                     aria-describedby="alert-dialog-description"
                                 >
@@ -399,16 +418,18 @@ const Home = () => {
                                         </DialogContentText>
                                     </DialogContent>
                                     <DialogActions>
-                                    <Button onClick={() => handleClose()}>{t("erase-dialog.disagree-button")}</Button>
-                                    <Button onClick={() => deleteForever(actualTask.id)} autoFocus>
-                                        {t("erase-dialog.agree-button")}
-                                    </Button>
+                                        <Button onClick={() => handleClose(actualTask.id)}>{t("erase-dialog.disagree-button")}</Button>
+                                        <Button id={actualTask.id} onClick={() => {
+                                                deleteForever(actualTask.id);
+                                            }} autoFocus>
+                                            {t("erase-dialog.agree-button")}
+                                        </Button>
                                     </DialogActions>
                                 </Dialog>
                             </div>
                         }
                         title={actualTask.title}
-                        subheader={actualTask.startDateTime}
+                        subheader={correctTime(actualTask.startDateTime)}
                     />
                     <CardContent>
                         <Typography variant="subtitle1" color="text.secondary">
@@ -417,12 +438,20 @@ const Home = () => {
                         <br/>
                         {miniTasks(actualTask)} 
                         <Typography variant="body2" color="text.secondary">
-                            {t("task.creation-date")} {actualTask.creationDateTime}
+                            {t("task.creation-date")} {correctTime(actualTask.creationDateTime)}
                         </Typography>
                     </CardContent>
                 </Card>
             </Grid>
         );
+    }
+
+    const correctTime = (time) => {
+        const tiempo = dayjs(time);
+
+        const correctTime = tiempo.add(2, 'hour');
+
+        return (correctTime.format('DD-MM-YYYY HH:mm'));
     }
 
     const handleTasks = () => {
@@ -468,6 +497,14 @@ const Home = () => {
         try {
             const response = await api.get('/task/user?user_id='+uid);
             setTasks(response.data);
+            const boolaux = [];
+            for (let i = 0; i < response.data.length; ++i) {
+                boolaux.push({
+                    id: response.data[i].id,
+                    isOpen: false,
+                });
+            }
+            setMessageOpen(boolaux);
         } 
         catch(err){
             console.log(err);

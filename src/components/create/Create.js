@@ -39,6 +39,8 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth, signOut } from "firebase/auth";
 
 import { useTranslation } from 'react-i18next';
+import { OAuth2Client } from 'google-auth-library';
+
 
 const drawerWidth = 240;
 
@@ -172,7 +174,7 @@ const Create = () => {
     const createTask = async () => {
         if (title != null && title != "") {
             if (value != null) {
-                const response = await api.post("/task/new", {
+                await api.post("/task/new", {
                     title: title,
                     description: description,
                     data: value,
@@ -181,30 +183,31 @@ const Create = () => {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
-                });
-                const id = response.data.id;
-                insertInCalendar(id);
-                if (miniTasks) {
-                    if (miniTasks.length > 0) {
-                        miniTasks.map((mt) => createMT(mt, id));
+                }).then((response) => {
+                    const id = response.data.id;
+
+                    if (miniTasks) {
+                        if (miniTasks.length > 0) {
+                            miniTasks.map((mt) => createMT(mt, id));
+                        }
                     }
-                }
-                navigate('/home');
+    
+                    insertInCalendar(id);
+    
+                    navigate('/home');
+                });
+                
             }
         }
     };
 
-    function insertInCalendar(id) {
-        const { google } = require('googleapis');
-        const oauth2Client = new google.auth.OAuth2();
-        oauth2Client.setCredentials({
-            access_token: localStorage.getItem("calendar"),
-        });
-        const calendar = google.calendar({ version: 'v3', auth: oauth2Client});
+    const insertInCalendar = async (id) => {
+
         const fecha = value.add(1, 'hour');
+
         const eventDetails = {
             summary: title,
-            description: 'ID:' + id + '; ' + description,
+            description: description,
             start: {
                 dateTime: value.toISOString(),
                 timeZone: 'Europe/Madrid',
@@ -213,20 +216,28 @@ const Create = () => {
                 dateTime: fecha.toISOString(),
                 timeZone: 'Europe/Madrid',
             },
+            reminders: {
+                useDefault: false,
+                overrides: [
+                  { method: 'email', minutes: 60 },
+                ],
+            },
+            id: "focus"+id,
         };
-        calendar.events.insert(
-            {
-                calendarId: 'primary',
-                resource: eventDetails,
-            }, 
-            (err, event) => {
-                if (err) {
-                    console.error('Error creando el evento:', err);
-                }
-                console.log('Evento creado:', event.data);
-            }
-        );
-    }; 
+
+        await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
+            method: "POST",
+            headers: {
+                'Authorization':'Bearer ' + localStorage.getItem("calendar") // Access token for google
+            },
+            body: JSON.stringify(eventDetails)
+        }).then((data) => {
+            return data.json();
+        }).then((data) => {
+            console.log(data);
+            alert("Event created, check your Google Calendar!");
+        });
+    };  
 
     const handleDescription = (description) => {
         setDescription(description.toString());

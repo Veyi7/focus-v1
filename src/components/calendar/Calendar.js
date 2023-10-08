@@ -332,7 +332,7 @@ const Calendar = () => {
                                 </div>
                             }
                             title={actualTask.title}
-                            subheader={actualTask.startDateTime}
+                            subheader={correctTime(actualTask.startDateTime)}
                         />
                         <CardContent>
                             <Typography variant="subtitle1" color="text.secondary">
@@ -342,13 +342,26 @@ const Calendar = () => {
                             {miniTasks(actualTask)} 
                             <br/>
                             <Typography variant="subtitle2" color="text.secondary">
-                                {t("task.creation-date")} {actualTask.creationDateTime}
+                                {t("task.creation-date")} {correctTime(actualTask.creationDateTime)}
                             </Typography>
                         </CardContent>
                     </Card>
                 </Container>
             </Box>
         );
+    }
+
+    const correctTime = (time) => {
+        
+        console.log(time);
+        
+        const tiempo = dayjs(time);
+
+        const correctTime = tiempo.add(2, 'hour');
+
+        console.log(correctTime);
+
+        return (correctTime.format('DD-MM-YYYY HH:mm'));
     }
 
     //Creates the list of Tasks for each day that has them

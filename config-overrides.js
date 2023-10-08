@@ -4,7 +4,6 @@ module.exports = function override(config) {
   const fallback = config.resolve.fallback || {};
 
   Object.assign(fallback, {
-    // ENABLE OR DISABLE YOUR POLYFILLS HERE
     stream: require.resolve("stream-browserify"),
     http: require.resolve("stream-http"),
     https: require.resolve("https-browserify"),
@@ -17,6 +16,11 @@ module.exports = function override(config) {
     zlib: require.resolve("browserify-zlib"),
     process: require.resolve("process"),
     assert: require.resolve("assert"),
+    net: false, 
+    fs: false,
+    
+    child_process: false,
+    tls: false,
   });
 
   config.resolve.fallback = fallback;
