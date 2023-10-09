@@ -220,6 +220,7 @@ const Create = () => {
                 useDefault: false,
                 overrides: [
                   { method: 'email', minutes: 60 },
+                  { method: 'popup', minutes: 30 },
                 ],
             },
             id: "focus"+id,

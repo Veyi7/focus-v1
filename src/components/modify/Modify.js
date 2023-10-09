@@ -307,6 +307,7 @@ const Modify = () => {
             useDefault: false,
             overrides: [
               { method: 'email', minutes: 60 },
+              { method: 'popup', minutes: 30 },
             ],
         },
     };
